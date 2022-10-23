@@ -1,28 +1,26 @@
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Role', {
-      id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          allowNull: false,
-          primaryKey: true
-      },
-      name: {
-        type: DataTypes.STRING,
-      }
-
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Role extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      this.hasMany(models.User, {
+        foreignKey: 'roleId',
+        as: 'Role_User_FK'
+      });
+    }
+  }
+  Role.init({
+    name: DataTypes.STRING
   }, {
-      sequelize,
-      tableName: 'Roles',
-      timestamps: true,
-      indexes: [
-        {
-          name: "Roles_pkey",
-          unique: true,
-          fields: [
-            { name: "id" },
-          ]
-        }
-      ],
-      freezeTableName:true
+    sequelize,
+    modelName: 'Role',
   });
+  return Role;
 };
