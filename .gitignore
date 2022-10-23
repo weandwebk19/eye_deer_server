@@ -1,0 +1,7 @@
+nodemon.json
+
+node_modules/
+
+workspace.code-workspace
+
+.env
