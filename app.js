@@ -22,9 +22,9 @@ db.sequelize
     console.error('Unable to connect to the database:', err);
   });
 //Sync the database
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log("Drop and re-sync DB");
-// });
+db.sequelize.sync({ force: true }).then(() => {
+  console.log("Drop and re-sync DB");
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
