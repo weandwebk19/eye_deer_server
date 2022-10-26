@@ -11,7 +11,7 @@ module.exports = {
       email: 'example@example.com',
       address: 'example',
       phone: '09885858585',
-      roleId: 3,
+      roleId: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

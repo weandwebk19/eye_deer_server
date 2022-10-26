@@ -12,11 +12,6 @@ module.exports = {
       name: 'student',
       createdAt: new Date(),
       updatedAt: new Date()
-    },
-    {
-      name: 'admin',
-      createdAt: new Date(),
-      updatedAt: new Date()
     }
   ]);
   },
