@@ -26,7 +26,9 @@ class AuthService {
                 email: body.email,
                 address: body.address,
                 phone: body.phone,
-                roleId: body.roleId
+                birthday: body.birthday,
+                roleId: body.roleId,
+                workplaceId: body.workplaceId
             }
         );
     }
