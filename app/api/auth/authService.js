@@ -19,16 +19,16 @@ class AuthService {
         const hashPassword = await bcrypt.hash(body.password, saltRounds);
         return await models.User.create(
             {
-                username: body.username, 
-                password: hashPassword, 
-                firstName: body.firstName,
-                lastName: body.lastName,
-                email: body.email,
-                address: body.address,
-                phone: body.phone,
-                birthday: body.birthday,
+                username: body.username,
+                password: hashPassword,
+                firstName: body.firstName?body.firstName:null,
+                lastName: body.lastName?body.lastName:null,
+                email: body.email?body.email:null,
+                address: body.address?body.address:null,
+                phone: body.phone?body.phone:null,
+                birthday: body.birthday?body.birthday:null,
                 roleId: body.roleId,
-                workplaceId: body.workplaceId
+                workplaceId: body.workplaceId?body.workplaceId:null
             }
         );
     }

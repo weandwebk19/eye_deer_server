@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const db = require('./app/models');
+const exec = require('child_process').exec;
 
 const app = express();
 dotenv.config({ path: '.env' });
@@ -23,6 +24,13 @@ db.sequelize
   });
 //Sync the database
 db.sequelize.sync({ force: true }).then(() => {
+  //Excute seed all tables from seeders folder
+  exec('npx sequelize-cli db:seed:all', {cwd: 'app'},
+    function (error, stdout, stderr) {
+        if (error !== null) {
+            console.log('exec error: ' + error);
+        }
+  });
   console.log("Drop and re-sync DB");
 });
 
