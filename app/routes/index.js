@@ -1,7 +1,8 @@
-const authRouter = require('../api/auth/authRouter');
-const userRouter = require('../api/users/userRouter');
-const workplaceRouter = require('../api/workplaces/workplaceRouter');
-const roleRouter = require('../api/roles/roleRouter');
+const authRouter = require('../components/auth/authRouter');
+const userRouter = require('../components/users/userRouter');
+const workplaceRouter = require('../components/workplaces/workplaceRouter');
+const roleRouter = require('../components/roles/roleRouter');
+const authMiddleware = require('../components/auth/authMiddleware');
 
 function route(app) {
   app.use('/user', userRouter);
@@ -9,8 +10,8 @@ function route(app) {
   app.use('/workplace', workplaceRouter);
   app.use('/role', roleRouter);
 
-  app.use('/', (req, res) => {
-    res.send('response with resource');
+  app.use('/', authMiddleware.verifyToken, (req, res, next) => {
+    res.status(200).json(req.user)
   })
 }
 

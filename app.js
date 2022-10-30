@@ -9,6 +9,8 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const db = require('./app/models');
 const exec = require('child_process').exec;
+const cors = require('cors');
+const rediscl = require('./app/redis');
 
 const app = express();
 dotenv.config({ path: '.env' });
@@ -24,6 +26,13 @@ db.sequelize
   });
 //Sync the database
 db.sequelize.sync({ force: true }).then(() => {
+  // exec('npx sequelize-cli db:migrate', {cwd: 'app'},
+  // function (error, stdout, stderr) {
+  //   if (error !== null) {
+  //     console.log('exec error: ' + error);
+  //   }
+  // });
+  
   //Excute seed all tables from seeders folder
   exec('npx sequelize-cli db:seed:all', {cwd: 'app'},
     function (error, stdout, stderr) {
@@ -33,6 +42,12 @@ db.sequelize.sync({ force: true }).then(() => {
   });
   console.log("Drop and re-sync DB");
 });
+
+//Connect to redis
+rediscl.on("connect", function () {
+  console.log("Redis plugged in.");
+});
+rediscl.on('error', (err) => console.log('Redis Client Error', err));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,6 +59,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
+app.use(cors())
 
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 
