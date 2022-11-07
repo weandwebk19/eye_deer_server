@@ -1,58 +1,42 @@
 const authService = require('./authService');
+const userService = require('../users/userService');
 const jwt = require('jsonwebtoken');
 const rediscl = require('../../redis');
 
 class AuthController {
     //[POST] /register
     register = async function(req, res) {
-        const { username, password } = req.body;
+        const { username, password, email } = req.body;
         try {
             //Username or password is not available
             if (!username || !password) {
                res.status(204).json({
                 success:false,
-                data: {
-                    message: 'Invalid username or password'
-                }
+                message: 'Invalid username or password'
                });
             } else {
                 //Check if the user already exists
-                const existedUser = await authService.getUserByUsername(username);
-                if (!existedUser) {
+                const existedUsername = await userService.getUserByUsername(username);
+                const existedEmail = await userService.getUserByEmail(email);
+                if (!existedUsername && !existedEmail) {
                     //create a new user
-                    await authService.createUser(req.body)
-                    .then(result => {
-                        res.status(201).json({
-                            success:true,
-                            data: {
-                                message: 'Register successfully',
-                                user: result
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        res.status(500).json({
-                            success:false,
-                            data: {
-                                message: 'Register failed: ' + err.message
-                            }
-                        });
-                    })
+                    const newUser = await userService.createUser(req.body);
+                    res.status(201).json({
+                        success:true,
+                        message: 'Register successfully',
+                        user: newUser
+                    });
                 } else {
                     res.status(200).json({
                         success:false,
-                        data: {
-                            message: 'User is already existed'
-                        }
+                        message: 'User is already existed'
                     });
                 }
             }
-        } catch (error) {
+        } catch (err) {
             res.status(500).json({
                 success:false,
-                data: {
-                    message: 'Register failed: ' + err.message
-                }
+                message: 'Register failed: ' + err.message
             });
         }
     }
@@ -96,7 +80,7 @@ class AuthController {
             //set cookies refreshtoken
             res.cookie("x-refresh-token", refreshToken, {
                 httpOnly: true,
-                secure: false,
+                secure: process.env.SERCURE_COOKIE,
                 path: "/",
                 sameSite: "strict"
             })
@@ -106,7 +90,33 @@ class AuthController {
             });
         }
         catch(err) {
+            console.log(err);
             res.status(500).json(err.message);
+        }
+    }
+
+    // [POST] /auth/oauth/login
+    OAuthLogin = async function(req, res) {
+        const account = req.body;
+        try {
+            //Check if the user already exists
+            const existedAccount = await userService.getUserByEmail(account.email);
+            if (existedAccount) {
+                req.user = existedAccount;
+                this.login(req, res);
+            }
+            else {
+                //console.log("navigate to register")
+                res.status(403).json({
+                    success:false,
+                    message: 'Login failed'
+                });
+            }
+        } catch (err) {
+            res.status(500).json({
+                success:false,
+                message: 'Login failed: ' + err.message
+            });
         }
     }
 
@@ -151,20 +161,25 @@ class AuthController {
             //set new refresh token to cookie
             res.cookie("x-refresh-token", newRefreshToken, {
                 httpOnly: true,
-                secure: false,
+                secure: process.env.SERCURE_COOKIE,
                 path: "/",
                 sameSite: "strict"
             });
 
             res.status(200).json({accessToken: newAccessToken});
         })
-
     }
 
     //[POST] /logout
-    logout = async (req, res) => {
+    logout = (req, res) => {
         const user = req.user;
-        res.clearCookie("x-refresh-token");
+        res.clearCookie("x-refresh-token",
+        {
+            path: '/',
+            sameSite: "strict",
+            secure: process.env.SERCURE_COOKIE
+        }
+        );
         //delete refresh token in redis
         rediscl.del(user.id, (err, reply) => {
             if(err) {

@@ -59,7 +59,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
-app.use(cors())
+app.use(
+  cors({
+      credentials: true,
+      origin: process.env.FRONTEND_BASE_URL
+  })
+);
 
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 

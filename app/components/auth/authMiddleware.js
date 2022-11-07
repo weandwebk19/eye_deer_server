@@ -12,6 +12,16 @@ class AuthMiddleware {
         })(req, res, next);
     }
 
+    //authenticate the user with the google credentials using passport
+    googleAuth = async function(req, res, next) {
+        passport.authenticate('google', function(err, user, info) {
+            if (err) { return next(err); }
+            if (!user) { return res.status(401).json({ message: info.message }); }
+            req.user = user;
+            next();
+        })(req, res, next);
+    }
+
     //Check if the user is authenticated
     verifyToken = function(req, res, next) {
         const token = req.headers.token;
