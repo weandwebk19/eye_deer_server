@@ -26,6 +26,13 @@ db.sequelize
   });
 //Sync the database
 db.sequelize.sync({ force: true }).then(() => {
+  // exec('npx sequelize-cli db:migrate:undo', {cwd: 'app'},
+  // function (error, stdout, stderr) {
+  //   if (error !== null) {
+  //     console.log('exec error: ' + error);
+  //   }
+  // });
+
   // exec('npx sequelize-cli db:migrate', {cwd: 'app'},
   // function (error, stdout, stderr) {
   //   if (error !== null) {

@@ -10,10 +10,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.hasOne(models.OAuth_Account, {
-        foreignKey: 'id',
-        as: 'OAuth_Account_User_FK'
-      });
     }
   }
   User.init({
