@@ -26,6 +26,13 @@ db.sequelize
   });
 //Sync the database
 db.sequelize.sync({ force: true }).then(() => {
+  // exec('npx sequelize-cli db:migrate:undo', {cwd: 'app'},
+  // function (error, stdout, stderr) {
+  //   if (error !== null) {
+  //     console.log('exec error: ' + error);
+  //   }
+  // });
+
   // exec('npx sequelize-cli db:migrate', {cwd: 'app'},
   // function (error, stdout, stderr) {
   //   if (error !== null) {
@@ -56,15 +63,20 @@ rediscl.on("error", (err) => console.log("Redis Client Error", err));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(methodOverride('_method'));
+app.use(
+  cors({
+      credentials: true,
+      origin: process.env.FRONTEND_BASE_URL
+  })
+);
 
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
-app.use(cors());
 
 //Route init
 route(app);
