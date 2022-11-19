@@ -18,9 +18,9 @@ router.get('/users', async function(req, res, next) {
 
 
 //get user info by username
-router.get('/profile/:username', userController.getUserByUsername);
+router.get('/profile/:username', authMiddleware.verifyToken, userController.getUserByUsername);
 
 //post use info to update profile
-router.post('/profile/:username', upload.single('avatarFile'), userController.updateProfileUser);
+router.post('/profile/:username', upload.single('avatarFile'), authMiddleware.verifyToken, userController.updateProfileUser);
 
 module.exports = router;
