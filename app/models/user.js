@@ -31,8 +31,11 @@ module.exports = (sequelize, DataTypes) => {
     birthday: DataTypes.DATE,
     phone: DataTypes.STRING,
     picture: DataTypes.STRING,
-    roleId: DataTypes.INTEGER,
     workplaceId: DataTypes.INTEGER,
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
   }, {
     sequelize,
     modelName: 'User',

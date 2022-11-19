@@ -49,4 +49,9 @@ router.post('/oauth/login', function(req, res, next) {
     authController.OAuthLogin(req, res);
 });
 
+// [GET] /auth/verify
+router.get('/verify/:hash', function(req, res, next) {
+    authController.verifyEmail(req, res);
+});
+
 module.exports = router;

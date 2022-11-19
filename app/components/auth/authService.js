@@ -3,30 +3,42 @@ const saltRounds = 10;
 const db = require('../../models');
 const models = db.sequelize.models;
 const Op = db.Sequelize.Op;
+const sendVerifyEmail = require('../../utils/sendVerifyEmail');
 
 class AuthService {
-    
+    storeHashEmail = async(user) => {
+        const email = user.email;
+        const userId = user.id;
+        const hash = await bcrypt.hash(userId, saltRounds);
+        await this.sendVerifyEmail(email, hash);
+        await models.VerifyUser.create({
+            userId,
+            hash
+        });
+    }
 
-    // getOAuthByID = async (id) => {
-    //     const account = await models.OAuth_Account.findOne({
-    //         where: {
-    //             id: id
-    //         },
-    //         raw: true
-    //     });
-    //     return account;
-    // }
+    sendVerifyEmail = async(email, hash) => {
+        try {
+            const link = `${process.env.BACKEND_BASE_URL}/auth/verify/${hash}`;
+            await sendVerifyEmail(email, "[Eye Deer] - Email Verification", link);
+        } catch (error) {
+            console.log("Send email error: " + error.message);
+        }
+    }
 
-
-
-    // createOAuthAccount = async(body) => {
-    //     return await models.OAuth_Account.create({
-    //         id: body.id,
-    //         sub: body.sub,
-    //         email_verified: body.email_verified,
-    //         locale: body.locale
-    //     })
-    // }
+    activeUser = async (hash) => {
+        const userVerify = await models.VerifyUser.findOne({ where: { hash: hash } });
+        if(userVerify === null) {
+            console.log("Hash not found");
+        }
+        else {
+            await models.User.update(
+                {active: true},
+                {where: {id: userVerify.userId}}
+            );
+            await models.VerifyUser.destroy({where: {hash: hash}});
+        }
+    }
 }
 
 module.exports = new AuthService;
