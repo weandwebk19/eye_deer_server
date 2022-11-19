@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const db = require('../../models');
 const models = db.sequelize.models;
+const sequelize = db.sequelize;
 
 class UserService {
     getUserByUsername = async (username) => {
@@ -50,6 +51,27 @@ class UserService {
                 workplaceId: body.workplaceId?body.workplaceId:null
             }
         );
+    }
+
+    async updateProfileUser(username, userInfo){
+        try{
+            const subSqlPicture = userInfo.avatarLink 
+                ? `, picture = '${userInfo.avatarLink}'` 
+                : (userInfo.isDeleteAvatar === "true"
+                        ?  `, picture = null`
+                        : '');
+            console.log(userInfo.isDeleteAvatar, subSqlPicture);
+            const sql = 
+                `update users
+                set firstName = N'${userInfo.firstName}', lastName = N'${userInfo.lastName}', 
+                email = '${userInfo.email}' ${subSqlPicture}
+                where users.username = '${username}'`;
+
+            await sequelize.query(sql);
+        }
+        catch(error){
+            console.log(error);
+        }
     }
 }
 
