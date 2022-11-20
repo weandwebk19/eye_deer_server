@@ -13,7 +13,6 @@ module.exports = {
       email: 'example@example.com',
       address: 'example',
       phone: '09885858585',
-      roleId: 1,
       birthDay: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()

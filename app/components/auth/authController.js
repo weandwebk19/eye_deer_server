@@ -21,6 +21,7 @@ class AuthController {
                 if (!existedUsername && !existedEmail) {
                     //create a new user
                     const newUser = await userService.createUser(req.body);
+                    await authService.storeHashEmail({id: newUser.id, email: newUser.email});
                     res.status(201).json({
                         success:true,
                         message: 'Register successfully',
@@ -91,7 +92,7 @@ class AuthController {
         }
         catch(err) {
             console.log(err);
-            res.status(500).json(err.message);
+            res.status(500).json({message: err.message});
         }
     }
 
@@ -187,6 +188,18 @@ class AuthController {
             }
         });
         res.status(200).json("Logged out");
+    }
+
+    //[POST] /auth/verify
+    verifyEmail = async (req, res) => {
+        const hash = req.params.hash;
+        try{
+            await authService.activeUser(hash);
+            res.redirect(`${process.env.FRONTEND_BASE_URL}/register/confirmation?success=true`);
+        }
+        catch(err) {
+            res.status(500).redirect(`${process.env.FRONTEND_BASE_URL}/register/confirmation?success=false`);
+        }
     }
 }
 
