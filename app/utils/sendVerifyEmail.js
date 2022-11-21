@@ -32,16 +32,15 @@ const sendEmail = async (email, subject, text) => {
             text-decoration: underline !important;
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
 </head>
 
-<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #f2f3f8;" leftmargin="0">
+<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #292929;" leftmargin="0">
     <!--100% body table-->
-    <table cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8"
-        style="@import url(https://fonts.googleapis.com/css?family=Rubik:300,400,500,700|Open+Sans:300,400,600,700); font-family: 'Open Sans', sans-serif;">
+    <table cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#292929"
+        style="@import url(https://fonts.googleapis.com/css2?family=IM+Fell+English&family=Ibarra+Real+Nova:wght@400;600;700&family=Poppins:wght@200;300;700); font-family: 'Poppins', sans-serif;">
         <tr>
             <td>
-                <table style="background-color: #f2f3f8; max-width:670px;  margin:0 auto;" width="100%" border="0"
+                <table style="background-color: #292929; max-width:670px;  margin:0 auto;" width="100%" border="0"
                     align="center" cellpadding="0" cellspacing="0">
                     <tr>
                         <td style="height:80px;">&nbsp;</td>
@@ -50,7 +49,7 @@ const sendEmail = async (email, subject, text) => {
                         <td style="text-align:center;">
                             <a href="https://eyedeer.vercel.app" title="logo" target="_blank">
                                 <img width="60"
-                                    src="https://eyedeer.vercel.app/static/media/logo.cce6db9a827a6ea5a7757eb3a4622a5c.svg"
+                                    src="https://res.cloudinary.com/dbaulxzoc/image/upload/v1668929604/WeAndWeb/logo_emmseh.png?fbclid=IwAR3aZAnV7ZvK997GG84tkdou6m234HrS5JlOoKmfWrWHu_hkr1yLFWR9ELs"
                                     title="logo" alt="logo">
                             </a>
                         </td>
@@ -61,23 +60,26 @@ const sendEmail = async (email, subject, text) => {
                     <tr>
                         <td>
                             <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0"
-                                style="max-width:670px;background:#fff; border-radius:3px; text-align:center;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
+                                style="max-width:670px;background:#E6E6E6; border-radius:3px; text-align:center;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
                                 <tr>
                                     <td style="height:40px;">&nbsp;</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:0 35px;">
+
                                         <h1
-                                            style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">
-                                            Hi there,
-                                            Welcome to Eye Deer.</h1>
+                                            style="color:#292929; font-weight:400; margin:0;font-size:32px;font-family:'Ibarra Real Nova', serif;">
+                                            <span style="color:#292929; font-weight:600; margin:0;font-size:120px;font-family:'Ibarra Real Nova', serif; letter-spacing: -10px;">H</span>
+                                            ail fellow,
+                                            welcome to </h1>
+                                            <h1 style="color:#292929; font-weight:600; margin:0;font-size:48px;font-family:'Ibarra Real Nova', serif; letter-spacing: 0.1em;">eyedeer.</h1>
                                         <span
                                             style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
-                                        <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                            Please click on the link below to verify your email address. This is required to confirm ownership of the email address.
+                                        <p style="color:#292929; font-size:15px;line-height:24px; margin:0;">
+                                            Please click on the link below to verify your email address. </br>This is required to confirm ownership of the email address.
                                         </p>
                                         <a href="${text}"
-                                            style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Verify
+                                            style="background:#292929;text-decoration:none !important; font-weight:500; margin-top:35px; color:#e6e6e6;text-transform:lowercase; font-size:14px;padding:10px 24px;display:inline-block; border: 3px double #e6e6e6">Verify
                                             Email</a>
                                     </td>
                                 </tr>

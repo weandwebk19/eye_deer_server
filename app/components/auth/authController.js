@@ -190,7 +190,7 @@ class AuthController {
         res.status(200).json("Logged out");
     }
 
-    //[POST] /auth/verify
+    //[GET] /auth/verify
     verifyEmail = async (req, res) => {
         const hash = req.params.hash;
         try{
