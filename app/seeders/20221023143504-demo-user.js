@@ -5,7 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 module.exports = {
   async up (queryInterface, Sequelize) {
     return queryInterface.bulkInsert('Users', [{
-      id: uuidv4(),
+      //id: uuidv4(),
+      id: "8088aa7e-c24d-4b74-9a68-012196c87417",
       username: 'admin',
       password: '$2b$10$PW9eWtUT0oD6efo2PMOp5OtvzGQQWSv4FhDYLjo3FxaCpOrPg8pGy',
       firstName: 'John',
