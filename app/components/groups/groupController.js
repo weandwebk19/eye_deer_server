@@ -1,51 +1,65 @@
 const groupService = require('./groupService');
 class GroupController {
-    // [GET] /group/owned?userId=123
-    ownedGroups = async function(req, res) {
-        const userId = req.query.userId;
-        if(userId === undefined) {
-            res.status(404).json("User not found");
-            return;
-        }
-        const groups = await groupService.getListOwnedGroup(userId)
-        .catch(err => {
-            res.status(500).json(err.message);
-            return;
-        });
 
-        res.status(200).json(groups);
-    }
-
-    // [GET] /group/joined?userId=123
-    joinedGroups = async function(req, res) {
-        const userId = req.query.userId;
-        if(userId === undefined) {
-            res.status(404).json("User not found");
-            return;
-        }
-        const groups = await groupService.getListJoinedGroup(userId)
-        .catch(err => {
-            res.status(500).json(err.message);
-            return;
-        });
-
-        res.status(200).json(groups);
-    }
-
-    // [GET] /group/members?groupId=xxx
-    amountMembers = async function(req, res) {
-        const groupId = req.query.groupId;
+    // [GET] /group/:id/members/total
+    totalMembers = async function(req, res) {
+        const groupId = req.params.groupId;
         if(groupId === undefined) {
             res.status(404).json("Group not found");
             return;
         }
-        const amount = await groupService.getAmountMembers(groupId)
+        const total = await groupService.getTotalMembers(groupId)
         .catch(err => {
             res.status(500).json(err.message);
             return;
         });
 
-        res.status(200).json(amount);
+        res.status(200).json(total);
+    }
+
+    // [POST] /group/:id/join
+    joinTheGroup = async function(req, res) {
+        const user = req.user;
+        const groupId = req.params.id;
+        //Check if the user is exists
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                message: "User not found",
+                data: {groupId}
+              }
+            )
+        }
+        //Check if the group is exists
+        if (!groupId) {
+            res.status(404).json({
+                success: false,
+                message: "Group not found",
+                data: {groupId}
+              }
+            )
+        }
+
+        //Add user to group
+        const groupUser = await groupService.addUserToGroup(groupId, user.id)
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                success: false,
+                message: "An error occurred while adding user",
+                data: {groupId}
+              }
+            );
+            return;
+        });
+
+        //Add user to group successfully
+        res.status(201).json({
+            success: true,
+            message: "Add user to group successfully",
+            data: groupUser
+          }
+        );
     }
 }
 
