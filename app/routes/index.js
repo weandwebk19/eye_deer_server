@@ -6,7 +6,7 @@ const groupRouter = require('../components/groups/groupRouter');
 const authMiddleware = require('../components/auth/authMiddleware');
 
 function route(app) {
-  app.use('/user', userRouter);
+  app.use('/user', authMiddleware.verifyToken, userRouter);
   app.use('/auth', authRouter);
   app.use('/workplace', workplaceRouter);
   app.use('/role', roleRouter);

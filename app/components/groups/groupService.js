@@ -18,7 +18,7 @@ class GroupService {
             ]
         });
         const groupsResponse = await Promise.all(groups.map(async(e) => {
-            const amountMember = await this.getAmountMembers(e.Group.id);
+            const amountMember = await this.getTotalMembers(e.Group.id);
             return {
                 id: e.Group.id,
                 name: e.Group.name,
@@ -47,7 +47,7 @@ class GroupService {
             ]
         });
         const groupsResponse = await Promise.all(groups.map(async(e) => {
-            const amountMember = await this.getAmountMembers(e.Group.id);
+            const amountMember = await this.getTotalMembers(e.Group.id);
             return {
                 id: e.Group.id,
                 name: e.Group.name,
@@ -62,13 +62,22 @@ class GroupService {
         return groupsResponse;
     }
 
-    getAmountMembers = async (groupId) => {
-        const amount = await models.Group_User.count({
+    getTotalMembers = async (groupId) => {
+        const total = await models.Group_User.count({
             distinct: true,
             col: 'userId',
             where: {groupId: groupId}
         })
-        return amount;
+        return total;
+    }
+
+    addUserToGroup = async function(groupId, userId){
+        const groupUser = await models.Group_User.create({
+            groupId,
+            userId,
+            roleId: 3
+        })
+       return groupUser;
     }
 }
 
