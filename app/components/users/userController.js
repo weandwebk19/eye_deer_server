@@ -1,9 +1,9 @@
 const userService = require('./userService');
 const bcrypt = require('bcrypt');
 const uploadImage = require('../../utils/cloudinary');
-
+const groupService = require('../groups/groupService');
 class UserController {
-    //[GET] /user?username={username
+    //[GET] /user?username={username}
     getUserByUsername = async (req, res) => {
         const params = req.params;
         if(params.username !== undefined) {
@@ -58,7 +58,37 @@ class UserController {
         }
     }
 
+    // [GET] user/:id/groups/owned
+    ownedGroups = async function(req, res) {
+        const userId = req.params.id;
+        if(userId === undefined) {
+            res.status(404).json("User not found");
+            return;
+        }
+        const groups = await groupService.getListOwnedGroup(userId)
+        .catch(err => {
+            res.status(500).json(err.message);
+            return;
+        });
 
+        res.status(200).json(groups);
+    }
+
+    // [GET] user/:id/groups/joined
+    joinedGroups = async function(req, res) {
+        const userId = req.params.id;
+        if(userId === undefined) {
+            res.status(404).json("User not found");
+            return;
+        }
+        const groups = await groupService.getListJoinedGroup(userId)
+        .catch(err => {
+            res.status(500).json(err.message);
+            return;
+        });
+
+        res.status(200).json(groups);
+    }
 }
 
 module.exports = new UserController;
