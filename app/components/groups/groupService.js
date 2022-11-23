@@ -70,6 +70,27 @@ class GroupService {
         })
         return amount;
     }
+
+    createGroup = async (groupInfo) => {
+        //insert new record to groups table
+        const newGroup = await models.Group.create(
+            {
+                ...groupInfo
+            }
+        );
+
+        //insert new record to group_users table
+        await models.Group_User.create(
+            {
+                userId: groupInfo.userId,
+                groupId: newGroup.id,
+                roleId: 1
+            }
+        );
+
+        //return id group
+        return newGroup.id;
+    }
 }
 
 module.exports = new GroupService;
