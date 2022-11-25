@@ -1,3 +1,4 @@
+const uploadImage = require('../../utils/cloudinary');
 const groupService = require('./groupService');
 class GroupController {
 
@@ -60,6 +61,34 @@ class GroupController {
             data: groupUser
           }
         );
+    }
+
+    // [POST] /group/create
+    createGroup = async function(req, res) {
+        try{
+            //upload image to cloudinary
+            const urlPicture = req.file ? await uploadImage(req.file.path) : null;
+
+            //receive data
+            const groupInfo = {
+                name: req.body.name, 
+                capacity: req.body.capacity,
+                status: req.body.status,
+                description: req.body.description,
+                picture: urlPicture,
+                userId: req.body.userId
+            };
+
+            console.log(groupInfo);
+            //create new group
+            const groupId = await groupService.createGroup(groupInfo);
+
+            res.status(200).json({success: true, message: "Success!", groupId: groupId});
+        }
+        catch(error){
+            console.log(error);
+            return res.status(500).json({success:false, message: "Server error!"})
+        }
     }
 }
 
