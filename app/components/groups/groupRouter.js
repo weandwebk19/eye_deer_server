@@ -4,17 +4,22 @@ const groupController = require("./groupController");
 const authMiddleware = require("../../components/auth/authMiddleware");
 const upload = require("../../utils/multer");
 
-// [GET] /group/:id/members/total
+// [GET] /groups/:id/members
+router.get("/:id/members", function (req, res, next) {
+  groupController.listMembers(req, res);
+});
+
+// [GET] /groups/:id/members/total
 router.get("/:id/members/total", function (req, res, next) {
   groupController.totalMembers(req, res);
 });
 
-// [POST] /group/:id/join
+// [POST] /groups/:id/join
 router.post("/:id/join", function (req, res, next) {
   groupController.joinTheGroup(req, res);
 });
 
-// [POST] /group/create group
+// [POST] /groups/create group
 router.post("/create", upload.single("picture"), groupController.createGroup);
 
 module.exports = router;

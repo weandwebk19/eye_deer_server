@@ -19,7 +19,7 @@ class GroupService {
     });
     const groupsResponse = await Promise.all(
       groups.map(async (e) => {
-        const amountMember = await this.getTotalMembers(e.Group.id);
+        const totalMembers = await this.getTotalMembers(e.Group.id);
         return {
           id: e.Group.id,
           name: e.Group.name,
@@ -27,7 +27,7 @@ class GroupService {
           status: e.Group.status,
           capacity: e.Group.capacity,
           picture: e.Group.picture,
-          amountMember: amountMember,
+          totalMembers: totalMembers,
         };
       })
     );
@@ -51,7 +51,7 @@ class GroupService {
     });
     const groupsResponse = await Promise.all(
       groups.map(async (e) => {
-        const amountMember = await this.getTotalMembers(e.Group.id);
+        const totalMembers = await this.getTotalMembers(e.Group.id);
         return {
           id: e.Group.id,
           name: e.Group.name,
@@ -59,7 +59,7 @@ class GroupService {
           status: e.Group.status,
           capacity: e.Group.capacity,
           picture: e.Group.picture,
-          amountMember: amountMember,
+          totalMembers: totalMembers,
         };
       })
     );
@@ -76,11 +76,48 @@ class GroupService {
     return total;
   };
 
+  getListMembers = async (groupId) => {
+    const members = await models.Group_User.findAll({
+      attributes: [],
+      include: [
+        {
+          model: models.User,
+          as: "User",
+          attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+        },
+      ],
+      where: { groupId: groupId },
+      raw: false,
+    });
+    const membersResponse = members.map((member) => {
+      return member.User;
+    });
+    return membersResponse;
+  };
+
+  isJoinedGroup = async (groupId, userId) => {
+    const count = await models.Group_User.count({
+      where: {
+        groupId: groupId,
+        userId: userId,
+      },
+    }).catch((err) => {
+      return true;
+    });
+    if (count > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   addUserToGroup = async function (groupId, userId) {
     const groupUser = await models.Group_User.create({
       groupId,
       userId,
       roleId: 3,
+    }).catch((err) => {
+      return err.message;
     });
     return groupUser;
   };

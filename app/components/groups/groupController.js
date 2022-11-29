@@ -1,7 +1,7 @@
 const uploadImage = require("../../utils/cloudinary");
 const groupService = require("./groupService");
 class GroupController {
-  // [GET] /group/:id/members/total
+  // [GET] /groups/:id/members/total
   totalMembers = async function (req, res) {
     const groupId = req.params.groupId;
     if (groupId === undefined) {
@@ -16,13 +16,41 @@ class GroupController {
     res.status(200).json(total);
   };
 
-  // [POST] /group/:id/join
+  // [GET] /groups/:id/members
+  listMembers = async function (req, res) {
+    const groupId = req.params.id;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group not found",
+        data: [],
+      });
+    }
+
+    try {
+      const members = await groupService.getListMembers(groupId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Get list members of group " + groupId + " successfully",
+        data: members,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+        data: [],
+      });
+    }
+  };
+
+  // [POST] /groups/:id/join
   joinTheGroup = async function (req, res) {
     const user = req.user;
     const groupId = req.params.id;
     //Check if the user is exists
     if (!user) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "User not found",
         data: { groupId },
@@ -30,34 +58,44 @@ class GroupController {
     }
     //Check if the group is exists
     if (!groupId) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Group not found",
         data: { groupId },
       });
     }
 
-    //Add user to group
-    const groupUser = await groupService
-      .addUserToGroup(groupId, user.id)
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
+    try {
+      // Check user is joined group
+      const isJoined = await groupService.isJoinedGroup(groupId, user.userId);
+      if (isJoined) {
+        return res.status(406).json({
           success: false,
-          message: "An error occurred while adding user",
+          message: "You have already joined this group",
           data: { groupId },
         });
-      });
+      }
 
-    //Add user to group successfully
-    res.status(201).json({
-      success: true,
-      message: "Add user to group successfully",
-      data: groupUser,
-    });
+      //Add user to group
+      const groupUser = await groupService.addUserToGroup(groupId, user.id);
+
+      //Add user to group successfully
+      return res.status(201).json({
+        success: true,
+        message: "Join the group successfully",
+        data: groupUser,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while adding user",
+        data: { groupId },
+      });
+    }
   };
 
-  // [POST] /group/create
+  // [POST] /groups/create
   createGroup = async function (req, res) {
     try {
       //upload image to cloudinary
