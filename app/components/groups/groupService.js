@@ -83,10 +83,13 @@ class GroupService {
         {
           model: models.User,
           as: "User",
-          attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+          attributes: { exclude: ["password"] },
         },
       ],
-      where: { groupId: groupId },
+      where: {
+        groupId: groupId,
+        roleId: { [Op.and]: [{ [Op.ne]: 1 }, { [Op.ne]: 2 }] },
+      },
       raw: false,
     });
     const membersResponse = members.map((member) => {
@@ -137,6 +140,39 @@ class GroupService {
 
     //return id group
     return newGroup.id;
+  };
+
+  getOwner = async (groupId) => {
+    const owner = await models.Group_User.findOne({
+      where: { groupId: groupId, roleId: 1 },
+      include: [
+        {
+          model: models.User,
+          as: "User",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+      raw: false,
+    });
+    return owner.User;
+  };
+
+  getlistCoOwners = async (groupId) => {
+    const coOwners = await models.Group_User.findAll({
+      where: { groupId: groupId, roleId: 2 },
+      include: [
+        {
+          model: models.User,
+          as: "User",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+      raw: false,
+    });
+    const coOwnersResponse = coOwners.map((coOwner) => {
+      return coOwner.User;
+    });
+    return coOwnersResponse;
   };
 }
 

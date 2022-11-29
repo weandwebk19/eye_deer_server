@@ -2,7 +2,7 @@ const uploadImage = require("../../utils/cloudinary");
 const groupService = require("./groupService");
 const userService = require("../users/userService");
 const sendEmail = require("../../utils/sendVerifyEmail");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 class GroupController {
   // [GET] /groups/:id/members/total
@@ -138,16 +138,21 @@ class GroupController {
 
       //check is member user?
       const member = await userService.getUserById(memberId);
-      if(!member){
-        res.status(422).json({success: false, message:  "Member is not exists!"});
+      if (!member) {
+        res
+          .status(422)
+          .json({ success: false, message: "Member is not exists!" });
         return;
       }
 
       //get user info
       const userInfo = await userService.getUserById(user.id);
-      
+
       //generate token to verify who join group, expire token is 7 days
-      const token = jwt.sign({groupId: groupId, memberId: memberId}, process.env.JWT_ACCESS_KEY);
+      const token = jwt.sign(
+        { groupId: groupId, memberId: memberId },
+        process.env.JWT_ACCESS_KEY
+      );
 
       //send email to member
       const subject = "[Eye Deer] - Join Group";
@@ -156,9 +161,7 @@ class GroupController {
       await sendEmail(member.email, subject, content, link);
 
       //return
-      res
-        .status(200)
-        .json({ success: true, message: "Success!"});
+      res.status(200).json({ success: true, message: "Success!" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: "Server error!" });
@@ -171,17 +174,77 @@ class GroupController {
       const token = req.params.token;
 
       //decode and get info
-      const info = jwt.verify(token, process.env.JWT_ACCESS_KEY, { expiresIn: "7d" });
+      const info = jwt.verify(token, process.env.JWT_ACCESS_KEY, {
+        expiresIn: "7d",
+      });
       console.log(info);
 
       //add member to group
       await groupService.addUserToGroup(info.groupId, info.memberId);
 
       //return
-      res.status(200).json({ success: true, message: "Success!", groupId: info.groupId });
+      res
+        .status(200)
+        .json({ success: true, message: "Success!", groupId: info.groupId });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: "Server error!" });
+    }
+  };
+
+  // [GET] /groups/:id/owner
+  ownerInfo = async function (req, res) {
+    const groupId = req.params.id;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group is wrong",
+        data: {},
+      });
+    }
+
+    try {
+      const owner = await groupService.getOwner(groupId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Get owner of group " + groupId + " successfully",
+        data: owner,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+        data: {},
+      });
+    }
+  };
+
+  // [GET] /groups/:id/co-owner
+  listCoOwners = async function (req, res) {
+    const groupId = req.params.id;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group is wrong",
+        data: [],
+      });
+    }
+
+    try {
+      const owners = await groupService.getlistCoOwners(groupId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Get co-owners of group " + groupId + " successfully",
+        data: owners,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+        data: [],
+      });
     }
   };
 }

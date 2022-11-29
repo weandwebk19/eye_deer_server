@@ -18,6 +18,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        userId: "8088aa7e-c24d-4b74-9a68-012196c87419",
+        groupId: 1,
+        roleId: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
