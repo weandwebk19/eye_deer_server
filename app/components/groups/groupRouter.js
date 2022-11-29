@@ -4,23 +4,37 @@ const groupController = require("./groupController");
 const authMiddleware = require("../../components/auth/authMiddleware");
 const upload = require("../../utils/multer");
 
-// [GET] /group/:id/members/total
+// [GET] /groups/:id/members
+router.get("/:id/members", function (req, res, next) {
+  groupController.listMembers(req, res);
+});
+
+// [GET] /groups/:id/members/total
 router.get("/:id/members/total", function (req, res, next) {
   groupController.totalMembers(req, res);
 });
 
-// [GET] /group/:id/invite/:token group
+// [GET] /groups/:id/invite/:token group
 router.get("/invite/:token", groupController.addMemberFromToken);
 
-// [POST] /group/:id/invite group
+// [POST] /groups/:id/invite group
 router.post("/:id/invite", upload.none(), groupController.inviteMember);
 
-// [POST] /group/:id/join
+// [POST] /groups/:id/join
 router.post("/:id/join", function (req, res, next) {
   groupController.joinTheGroup(req, res);
 });
 
-// [POST] /group/create group
+// [POST] /groups/create group
 router.post("/create", upload.single("picture"), groupController.createGroup);
+
+// [GET] /groups/:id/owner
+router.get("/:id/owner", function (req, res, next) {
+  groupController.ownerInfo(req, res);
+});
+// [GET] /groups/:id/co-owner
+router.get("/:id/co-owner", function (req, res, next) {
+  groupController.listCoOwners(req, res);
+});
 
 module.exports = router;

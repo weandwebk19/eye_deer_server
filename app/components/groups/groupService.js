@@ -19,7 +19,7 @@ class GroupService {
     });
     const groupsResponse = await Promise.all(
       groups.map(async (e) => {
-        const amountMember = await this.getTotalMembers(e.Group.id);
+        const totalMembers = await this.getTotalMembers(e.Group.id);
         return {
           id: e.Group.id,
           name: e.Group.name,
@@ -27,7 +27,7 @@ class GroupService {
           status: e.Group.status,
           capacity: e.Group.capacity,
           picture: e.Group.picture,
-          amountMember: amountMember,
+          totalMembers: totalMembers,
         };
       })
     );
@@ -51,7 +51,7 @@ class GroupService {
     });
     const groupsResponse = await Promise.all(
       groups.map(async (e) => {
-        const amountMember = await this.getTotalMembers(e.Group.id);
+        const totalMembers = await this.getTotalMembers(e.Group.id);
         return {
           id: e.Group.id,
           name: e.Group.name,
@@ -59,7 +59,7 @@ class GroupService {
           status: e.Group.status,
           capacity: e.Group.capacity,
           picture: e.Group.picture,
-          amountMember: amountMember,
+          totalMembers: totalMembers,
         };
       })
     );
@@ -76,11 +76,51 @@ class GroupService {
     return total;
   };
 
+  getListMembers = async (groupId) => {
+    const members = await models.Group_User.findAll({
+      attributes: [],
+      include: [
+        {
+          model: models.User,
+          as: "User",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+      where: {
+        groupId: groupId,
+        roleId: { [Op.and]: [{ [Op.ne]: 1 }, { [Op.ne]: 2 }] },
+      },
+      raw: false,
+    });
+    const membersResponse = members.map((member) => {
+      return member.User;
+    });
+    return membersResponse;
+  };
+
+  isJoinedGroup = async (groupId, userId) => {
+    const count = await models.Group_User.count({
+      where: {
+        groupId: groupId,
+        userId: userId,
+      },
+    }).catch((err) => {
+      return true;
+    });
+    if (count > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   addUserToGroup = async function (groupId, userId) {
     const groupUser = await models.Group_User.create({
       groupId,
       userId,
       roleId: 3,
+    }).catch((err) => {
+      return err.message;
     });
     return groupUser;
   };
@@ -100,6 +140,39 @@ class GroupService {
 
     //return id group
     return newGroup.id;
+  };
+
+  getOwner = async (groupId) => {
+    const owner = await models.Group_User.findOne({
+      where: { groupId: groupId, roleId: 1 },
+      include: [
+        {
+          model: models.User,
+          as: "User",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+      raw: false,
+    });
+    return owner.User;
+  };
+
+  getlistCoOwners = async (groupId) => {
+    const coOwners = await models.Group_User.findAll({
+      where: { groupId: groupId, roleId: 2 },
+      include: [
+        {
+          model: models.User,
+          as: "User",
+          attributes: { exclude: ["password"] },
+        },
+      ],
+      raw: false,
+    });
+    const coOwnersResponse = coOwners.map((coOwner) => {
+      return coOwner.User;
+    });
+    return coOwnersResponse;
   };
 }
 
