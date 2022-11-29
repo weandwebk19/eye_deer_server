@@ -1,5 +1,9 @@
 const uploadImage = require("../../utils/cloudinary");
 const groupService = require("./groupService");
+const userService = require("../users/userService");
+const sendEmail = require("../../utils/sendVerifyEmail");
+const jwt = require('jsonwebtoken');
+
 class GroupController {
   // [GET] /groups/:id/members/total
   totalMembers = async function (req, res) {
@@ -118,6 +122,63 @@ class GroupController {
       res
         .status(200)
         .json({ success: true, message: "Success!", groupId: groupId });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: "Server error!" });
+    }
+  };
+
+  // [POST] /group/create
+  inviteMember = async function (req, res) {
+    try {
+      //get info
+      const user = req.user;
+      const groupId = req.params.id;
+      const memberId = req.body.memberId;
+
+      //check is member user?
+      const member = await userService.getUserById(memberId);
+      if(!member){
+        res.status(422).json({success: false, message:  "Member is not exists!"});
+        return;
+      }
+
+      //get user info
+      const userInfo = await userService.getUserById(user.id);
+      
+      //generate token to verify who join group, expire token is 7 days
+      const token = jwt.sign({groupId: groupId, memberId: memberId}, process.env.JWT_ACCESS_KEY);
+
+      //send email to member
+      const subject = "[Eye Deer] - Join Group";
+      const content = `${userInfo.lastName} ${userInfo.firstName}(${userInfo.email}) has invited you join to their group.<br>Click below button to join this group!`;
+      const link = `${process.env.FRONTEND_BASE_URL}/group/invite/${token}`;
+      await sendEmail(member.email, subject, content, link);
+
+      //return
+      res
+        .status(200)
+        .json({ success: true, message: "Success!"});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, message: "Server error!" });
+    }
+  };
+
+  addMemberFromToken = async function (req, res) {
+    try {
+      //get token
+      const token = req.params.token;
+
+      //decode and get info
+      const info = jwt.verify(token, process.env.JWT_ACCESS_KEY, { expiresIn: "7d" });
+      console.log(info);
+
+      //add member to group
+      await groupService.addUserToGroup(info.groupId, info.memberId);
+
+      //return
+      res.status(200).json({ success: true, message: "Success!", groupId: info.groupId });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, message: "Server error!" });

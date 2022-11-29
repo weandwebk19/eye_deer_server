@@ -19,8 +19,10 @@ class AuthService {
 
   sendVerifyEmail = async (email, hash) => {
     try {
+      const subject = "[Eye Deer] - Email Verification";
+      const content = `Please click on the link below to verify your email address. </br> This is required to confirm ownership of the email address.`;
       const link = `${process.env.BACKEND_BASE_URL}/auth/user/verify?hash=${hash}`;
-      await sendVerifyEmail(email, "[Eye Deer] - Email Verification", link);
+      await sendVerifyEmail(email, subject, content, link);
     } catch (error) {
       console.log("Send email error: " + error.message);
     }

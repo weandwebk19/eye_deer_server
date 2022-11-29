@@ -2,7 +2,7 @@ const { text } = require("express");
 const nodemailer = require("nodemailer");
 require('dotenv').config();
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, content, link) => {
     try {
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST,
@@ -76,11 +76,12 @@ const sendEmail = async (email, subject, text) => {
                                         <span
                                             style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                         <p style="color:#292929; font-size:15px;line-height:24px; margin:0;">
-                                            Please click on the link below to verify your email address. </br>This is required to confirm ownership of the email address.
+                                            ${content}
                                         </p>
-                                        <a href="${text}"
-                                            style="background:#292929;text-decoration:none !important; font-weight:500; margin-top:35px; color:#e6e6e6;text-transform:lowercase; font-size:14px;padding:10px 24px;display:inline-block; border: 3px double #e6e6e6">Verify
-                                            Email</a>
+                                        <a href="${link}"
+                                            style="background:#292929;text-decoration:none !important; font-weight:500; margin-top:35px; color:#e6e6e6;text-transform:lowercase; font-size:14px;padding:10px 24px;display:inline-block; border: 3px double #e6e6e6">
+                                            Click Here!
+                                        </a>
                                     </td>
                                 </tr>
                                 <tr>
