@@ -4,6 +4,11 @@ const groupController = require("./groupController");
 const authMiddleware = require("../../components/auth/authMiddleware");
 const upload = require("../../utils/multer");
 
+// [GET] /groups/:id
+router.get("/:id", function (req, res, next) {
+  groupController.groupInfo(req, res);
+});
+
 // [GET] /groups/:id/members
 router.get("/:id/members", function (req, res, next) {
   groupController.listMembers(req, res);

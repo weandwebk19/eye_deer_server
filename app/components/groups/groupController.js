@@ -5,6 +5,17 @@ const sendEmail = require("../../utils/sendVerifyEmail");
 const jwt = require("jsonwebtoken");
 
 class GroupController {
+  //[GET] /groups/:id
+  groupInfo = async function (req, res) {
+    const groupId = req.params.id;
+    if (groupId === undefined) {
+      res.status(404).json("Group not found");
+      return;
+    }
+    const info = await groupService.getGroupById(groupId);
+    res.status(200).json(info);
+  };
+
   // [GET] /groups/:id/members/total
   totalMembers = async function (req, res) {
     const groupId = req.params.groupId;
