@@ -3,6 +3,17 @@ const models = db.sequelize.models;
 const Op = db.Sequelize.Op;
 
 class GroupService {
+  getGroupById = async (groupId) => {
+    const group = await models.Group.findOne({
+      raw: false,
+      where: {
+        id: groupId,
+      },
+    });
+
+    return group;
+  };
+
   getListOwnedGroup = async (userId) => {
     const groups = await models.Group_User.findAll({
       raw: false,
