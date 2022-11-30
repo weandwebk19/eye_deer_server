@@ -50,6 +50,21 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        //id: uuidv4(),
+        id: "8088aa7e-c24d-4b74-9a68-012196c87420",
+        username: "test2",
+        password:
+          "$2b$10$PW9eWtUT0oD6efo2PMOp5OtvzGQQWSv4FhDYLjo3FxaCpOrPg8pGy",
+        firstName: "Manh",
+        lastName: "Nguyen",
+        email: "exampletest1234@gmail.com",
+        address: "example",
+        phone: "09885858505",
+        birthDay: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
