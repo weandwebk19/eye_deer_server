@@ -1,3 +1,4 @@
+const { raw } = require("express");
 const db = require("../../models");
 const models = db.sequelize.models;
 const Op = db.Sequelize.Op;
@@ -5,13 +6,19 @@ const Op = db.Sequelize.Op;
 class GroupService {
   getGroupById = async (groupId) => {
     const group = await models.Group.findOne({
-      raw: false,
+      raw: true,
       where: {
         id: groupId,
       },
     });
 
-    return group;
+    const totalMember = await this.getTotalMembers(groupId);
+
+    const res = {
+      ...group,
+      totalMember,
+    };
+    return res;
   };
 
   getListOwnedGroup = async (userId) => {
@@ -116,7 +123,7 @@ class GroupService {
         userId: userId,
       },
     }).catch((err) => {
-      return true;
+      return false;
     });
     if (count > 0) {
       return true;
@@ -184,6 +191,46 @@ class GroupService {
       return coOwner.User;
     });
     return coOwnersResponse;
+  };
+
+  getRole = async (groupId, userId) => {
+    try {
+      const groupUser = await models.Group_User.findOne({
+        attributes: ["roleId"],
+        where: { groupId: groupId, userId: userId },
+        raw: false,
+      });
+      return groupUser.roleId;
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+  };
+
+  changeRole = async (groupId, userId, role) => {
+    try {
+      const groupUser = await models.Group_User.update(
+        { roleId: role },
+        { where: { groupId: groupId, userId: userId } }
+      );
+      return groupUser;
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+  };
+
+  removeMember = async (groupId, userId) => {
+    try {
+      const groupUser = await models.Group_User.destroy({
+        where: { groupId: groupId, userId: userId },
+        force: true,
+      });
+      return groupUser;
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
   };
 }
 

@@ -83,6 +83,7 @@ class GroupController {
     try {
       // Check user is joined group
       const isJoined = await groupService.isJoinedGroup(groupId, user.userId);
+      console.log(isJoined);
       if (isJoined) {
         return res.status(406).json({
           success: false,
@@ -255,6 +256,128 @@ class GroupController {
         success: false,
         message: err.message,
         data: [],
+      });
+    }
+  };
+
+  // [POST] /groups/:id/co-owner/terminate
+  terminateCoOwner = async function (req, res) {
+    const groupId = req.params.id;
+    const userId = req.params.userId;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group is wrong",
+      });
+    }
+
+    if (userId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "User is wrong",
+      });
+    }
+
+    try {
+      const role = await groupService.getRole(groupId, userId);
+      if (role !== 2) {
+        return res.status(406).json({
+          success: false,
+          message: "This user is not co-owner",
+        });
+      }
+      await groupService.changeRole(groupId, userId, 3);
+
+      return res.status(200).json({
+        success: true,
+        message: "Terminate co-owners of group successfully.",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
+
+  // [POST] /groups/:id/co-owner/assign
+  assignCoOwner = async function (req, res) {
+    const groupId = req.params.id;
+    const userId = req.params.userId;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group is wrong",
+      });
+    }
+
+    if (userId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "User is wrong",
+      });
+    }
+
+    try {
+      const role = await groupService.getRole(groupId, userId);
+      if (role === 2) {
+        return res.status(406).json({
+          success: false,
+          message: "The co-ownership has been already assigned for this user.",
+        });
+      }
+      await groupService.changeRole(groupId, userId, 2);
+
+      return res.status(200).json({
+        success: true,
+        message: "Successfully assigned.",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
+
+  // [DELETE] /groups/:id/members/:userId/kickout
+  kickOutMember = async function (req, res) {
+    const groupId = req.params.id;
+    const userId = req.params.userId;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group is wrong",
+      });
+    }
+
+    if (userId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "User is wrong",
+      });
+    }
+
+    try {
+      // Check user is joined group
+      const isJoined = await groupService.isJoinedGroup(groupId, userId);
+      if (!isJoined) {
+        return res.status(406).json({
+          success: false,
+          message: "This user has not joined group yet",
+        });
+      }
+
+      await groupService.removeMember(groupId, userId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Remove member out of group successfully.",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
       });
     }
   };
