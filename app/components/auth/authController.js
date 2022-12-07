@@ -10,7 +10,7 @@ class AuthController {
     try {
       //Username or password is not available
       if (!username || !password) {
-        res.status(204).json({
+        return res.status(204).json({
           success: false,
           message: "Invalid username or password",
         });
@@ -21,24 +21,22 @@ class AuthController {
         if (!existedUsername && !existedEmail) {
           //create a new user
           const newUser = await userService.createUser(req.body);
-          await authService.storeHashEmail({
-            id: newUser.id,
-            email: newUser.email,
-          });
-          res.status(201).json({
+          // send verify email notification
+          await authService.sendVerifyEmail(newUser.email, newUser.id);
+          return res.status(201).json({
             success: true,
             message: "Register successfully",
             user: newUser,
           });
         } else {
-          res.status(200).json({
+          return res.status(409).json({
             success: false,
             message: "User is already existed",
           });
         }
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "Register failed: " + err.message,
       });
@@ -193,27 +191,74 @@ class AuthController {
     res.status(200).json("Logged out");
   };
 
-  //[GET] /auth/verify
+  //[GET] auth/user/verify/token=xxx
   verifyEmail = async (req, res) => {
-    const hash = req.query.hash;
+    const token = req.params.token;
     try {
-      const isActive = await authService.activeUser(hash);
-      if (isActive) {
-        res.redirect(
-          `${process.env.FRONTEND_BASE_URL}/register/confirmation?success=true`
-        );
-      } else {
-        res
+      const userVerify = jwt.verify(token, process.env.JWT_ACCESS_KEY, {
+        expiresIn: process.env.JWT_VERIFY_EXPIRATION,
+      });
+      if (!userVerify) {
+        return res
           .status(404)
           .redirect(
-            `${process.env.FRONTEND_BASE_URL}/register/confirmation?success=false`
+            `${process.env.FRONTEND_BASE_URL}/confirmation?success=false&message=Token not found`
           );
+      } else {
+        const isActive = await userService.activeUser(userVerify.userId);
+        if (isActive) {
+          return res.redirect(
+            `${process.env.FRONTEND_BASE_URL}/confirmation?success=true`
+          );
+        } else {
+          return res
+            .status(404)
+            .redirect(
+              `${process.env.FRONTEND_BASE_URL}/confirmation?success=false`
+            );
+        }
       }
     } catch (err) {
-      res
+      return res
         .status(500)
         .redirect(
-          `${process.env.FRONTEND_BASE_URL}/register/confirmation?success=false`
+          `${process.env.FRONTEND_BASE_URL}/confirmation?success=false&message=${err.message}`
+        );
+    }
+  };
+
+  //[GET] auth/user/cancel/token=xxx
+  cancelEmail = async (req, res) => {
+    const token = req.params.token;
+    try {
+      const user = jwt.verify(token, process.env.JWT_ACCESS_KEY, {
+        expiresIn: process.env.JWT_VERIFY_EXPIRATION,
+      });
+      if (!user) {
+        return res
+          .status(404)
+          .redirect(
+            `${process.env.FRONTEND_BASE_URL}/register/cancel?success=false&message=Cancel registration request is expire.`
+          );
+      } else {
+        const isCanceled = await userService.destroyUser(user.userId);
+        if (isCanceled) {
+          return res.redirect(
+            `${process.env.FRONTEND_BASE_URL}/register/cancel?success=true`
+          );
+        } else {
+          return res
+            .status(404)
+            .redirect(
+              `${process.env.FRONTEND_BASE_URL}/register/cancel?success=false`
+            );
+        }
+      }
+    } catch (err) {
+      return res
+        .status(500)
+        .redirect(
+          `${process.env.FRONTEND_BASE_URL}/register/cancel?success=false&message=${err.message}`
         );
     }
   };

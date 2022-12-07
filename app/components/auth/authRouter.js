@@ -33,7 +33,7 @@ router.post("/refresh", function (req, res, next) {
   authController.refreshToken(req, res);
 });
 
-// [POST] /logout
+// [POST] /auth/logout
 router.post("/logout", authMiddleware.verifyToken, function (req, res, next) {
   authController.logout(req, res);
 });
@@ -58,10 +58,14 @@ router.post("/oauth/login", function (req, res, next) {
   authController.OAuthLogin(req, res);
 });
 
-// [GET] /auth/user/verify?hash=xxx
-router.get("/user/verify", function (req, res, next) {
-  console.log(req.query.hash);
+// [GET] /auth/user/verify/token=xxx
+router.get("/user/verify/:token", function (req, res, next) {
   authController.verifyEmail(req, res);
+});
+
+// [GET] /auth/user/cancel/token=xxx
+router.get("/user/cancel/:token", function (req, res, next) {
+  authController.cancelEmail(req, res);
 });
 
 module.exports = router;

@@ -1,25 +1,25 @@
 const { text } = require("express");
 const nodemailer = require("nodemailer");
-require('dotenv').config();
+require("dotenv").config();
 
-const sendEmail = async (email, subject, content, link) => {
-    try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
-            service: process.env.MAIL_SERVICE,
-            port: process.env.MAIL_PORT,
-            secure: true,
-            auth: {
-                user: process.env.MAIL_USERNAME,
-                pass: process.env.MAIL_PASSWORD,
-            },
-        });
-        let body = {
-            from: process.env.MAIL_USERNAME,
-            to: email,
-            subject: subject,
-            text: text,
-            html: `
+const sendEmail = async (email, subject, content, link, rejectLink) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      service: process.env.MAIL_SERVICE,
+      port: process.env.MAIL_PORT,
+      secure: true,
+      auth: {
+        user: process.env.MAIL_USERNAME,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
+    let body = {
+      from: process.env.MAIL_USERNAME,
+      to: email,
+      subject: subject,
+      text: text,
+      html: `
             <!doctype html>
 <html lang="en-US">
 
@@ -82,6 +82,21 @@ const sendEmail = async (email, subject, content, link) => {
                                             style="background:#292929;text-decoration:none !important; font-weight:500; margin-top:35px; color:#e6e6e6;text-transform:lowercase; font-size:14px;padding:10px 24px;display:inline-block; border: 3px double #e6e6e6">
                                             Click Here!
                                         </a>
+
+                                        ${
+                                          rejectLink
+                                            ? '<p style="color:#292929; font-size:15px;line-height:24px; margin-top:35px;">' +
+                                              '<strong style="color:#ef414c">' +
+                                              "Important!" +
+                                              "</strong>" +
+                                              "If it is not you, kindly cancel by" +
+                                              `<a href="${rejectLink}"> clicking here</a>.` +
+                                              "</p>" +
+                                              '<p style="color:#292929; font-size:13px;line-height:24px; margin-top:35px;">' +
+                                              "If you do not cancel your account information is still saved on our application. You will not be able to cancel after 7 days from the time we email you." +
+                                              "</p > "
+                                            : null
+                                        }
                                     </td>
                                 </tr>
                                 <tr>
@@ -103,20 +118,19 @@ const sendEmail = async (email, subject, content, link) => {
 </body>
 
 </html>`,
-        }
+    };
 
-        await transporter.sendMail(body, (err, result) => {
-            if (err) {
-                console.log(err);
-                return false
-            }
-            console.log(result);
-            console.log("email sent sucessfully");
-        })
-
-    } catch (error) {
-        console.log(error, "email not sent");
-    }
+    await transporter.sendMail(body, (err, result) => {
+      if (err) {
+        console.log(err);
+        return false;
+      }
+      console.log(result);
+      console.log("email sent sucessfully");
+    });
+  } catch (error) {
+    console.log(error, "email not sent");
+  }
 };
 
 module.exports = sendEmail;

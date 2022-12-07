@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       phone: DataTypes.STRING,
       picture: DataTypes.STRING,
       workplaceId: DataTypes.INTEGER,
-      active: {
+      verifyStatus: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
