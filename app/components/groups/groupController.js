@@ -169,7 +169,7 @@ class GroupController {
       //send email to member
       const subject = "[Eye Deer] - Join Group";
       const content = `${userInfo.lastName} ${userInfo.firstName}(${userInfo.email}) has invited you join to their group.<br>Click below button to join this group!`;
-      const link = `${process.env.FRONTEND_BASE_URL}/group/invite/${token}`;
+      const link = `${process.env.FRONTEND_BASE_URL}/groups/invite/${token}`;
       await sendEmail(member.email, subject, content, link);
 
       //return

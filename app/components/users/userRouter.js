@@ -9,6 +9,10 @@ router.get("/", function (req, res, next) {
   userController.getUser(req, res);
 });
 
+router.get("/verify-status", function (req, res, next) {
+  userController.verifyStatus(req, res);
+});
+
 //Search users by username or email or firstName
 router.get("/search/items", function (req, res, next) {
   userController.getSearchUser(req, res);
@@ -33,5 +37,10 @@ router.post(
   upload.single("avatarFile"),
   userController.updateProfileUser
 );
+
+// [POST] /users/verify/email/send
+router.get("/verify/email/send", function (req, res, next) {
+  userController.reSendVerifyEmail(req, res);
+});
 
 module.exports = router;

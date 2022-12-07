@@ -99,6 +99,44 @@ class UserService {
       console.log(error);
     }
   }
+
+  activeUser = async (userId) => {
+    try {
+      await models.User.update(
+        { verifyStatus: true },
+        { where: { id: userId } }
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  destroyUser = async (userId) => {
+    try {
+      await models.User.destroy({ where: { id: userId } });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  getVerifyStatus = async (userId) => {
+    try {
+      const user = await models.User.findOne({
+        attributes: ["verifyStatus"],
+        where: {
+          id: userId,
+        },
+        raw: false,
+      });
+      if (user) {
+        return user.verifyStatus;
+      }
+    } catch (error) {
+      return error;
+    }
+  };
 }
 
 module.exports = new UserService();
