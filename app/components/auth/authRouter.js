@@ -58,13 +58,13 @@ router.post("/oauth/login", function (req, res, next) {
   authController.OAuthLogin(req, res);
 });
 
-// [GET] /auth/user/verify/token=xxx
-router.get("/user/verify/:token", function (req, res, next) {
+// [GET] /auth/user/verify?token=xxx
+router.get("/user/verify", function (req, res, next) {
   authController.verifyEmail(req, res);
 });
 
-// [GET] /auth/user/cancel/token=xxx
-router.get("/user/cancel/:token", function (req, res, next) {
+// [GET] /auth/user/cancel?token=xxx
+router.get("/user/cancel", function (req, res, next) {
   authController.cancelEmail(req, res);
 });
 

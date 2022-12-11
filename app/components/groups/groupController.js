@@ -59,6 +59,35 @@ class GroupController {
     }
   };
 
+  // [GET] /groups/:id/presentations
+  listPresentations = async function (req, res) {
+    const groupId = req.params.id;
+    if (groupId === undefined) {
+      return res.status(404).json({
+        success: false,
+        message: "Group not found",
+        data: [],
+      });
+    }
+
+    try {
+      const presentations = await groupService.getListPresentations(groupId);
+
+      return res.status(200).json({
+        success: true,
+        message:
+          "Get list presentations of group " + groupId + " successfully.",
+        data: presentations,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+        data: [],
+      });
+    }
+  };
+
   // [POST] /groups/:id/join
   joinTheGroup = async function (req, res) {
     const user = req.user;

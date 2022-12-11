@@ -116,6 +116,26 @@ class GroupService {
     return membersResponse;
   };
 
+  getListPresentations = async (groupId) => {
+    const presentations = await models.Group_Presentation.findAll({
+      attributes: [],
+      include: [
+        {
+          model: models.Presentation,
+          as: "Presentation",
+        },
+      ],
+      where: {
+        groupId: groupId,
+      },
+      raw: false,
+    });
+    const presentationsResponse = presentations.map((presentation) => {
+      return presentation.Presentation;
+    });
+    return presentationsResponse;
+  };
+
   isJoinedGroup = async (groupId, userId) => {
     const count = await models.Group_User.count({
       where: {

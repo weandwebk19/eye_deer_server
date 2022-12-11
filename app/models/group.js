@@ -16,6 +16,13 @@ module.exports = (sequelize, DataTypes) => {
         as: "Group",
         constraints: false,
       });
+      this.belongsToMany(models.Presentation, {
+        through: "Group_Presentation",
+        foreignKey: "groupId",
+        otherKey: "presentationId",
+        as: "GroupPresentation",
+        constraints: false,
+      });
     }
   }
   Group.init(

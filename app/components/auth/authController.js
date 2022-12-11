@@ -191,9 +191,9 @@ class AuthController {
     res.status(200).json("Logged out");
   };
 
-  //[GET] auth/user/verify/token=xxx
+  //[GET] auth/user/verify?token=xxx
   verifyEmail = async (req, res) => {
-    const token = req.params.token;
+    const token = req.query.token;
     try {
       const userVerify = jwt.verify(token, process.env.JWT_ACCESS_KEY, {
         expiresIn: process.env.JWT_VERIFY_EXPIRATION,
@@ -227,9 +227,9 @@ class AuthController {
     }
   };
 
-  //[GET] auth/user/cancel/token=xxx
+  //[GET] auth/user/cancel?token=xxx
   cancelEmail = async (req, res) => {
-    const token = req.params.token;
+    const token = req.query.token;
     try {
       const user = jwt.verify(token, process.env.JWT_ACCESS_KEY, {
         expiresIn: process.env.JWT_VERIFY_EXPIRATION,

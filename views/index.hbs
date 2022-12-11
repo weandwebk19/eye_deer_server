@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+      integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+      crossorigin="anonymous"
+    ></script>
+   
+
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io("http://localhost:3001");
+      console.log(socket);
+
+      socket.on("server-send-register-fail", function () {
+        $("#alert-fail").html("<p>Register fail! Because this username is already registered </p>");
+      });
+
+      socket.on("server-send-register-success", function (data) {
+        $("#current-user").html(data);
+        $("#login-box").hide(2000);
+        $("#chat-box").show(1000);
+      });
+
+      socket.on("server-send-online-users", function (data) {
+        const listUsers = $("#list-user");
+        listUsers.html("");
+        data.forEach(function (i) {
+          listUsers.append(`<div class="friend-drawer friend-drawer--onhover">
+            <div class="text">
+              <h6>${i}</h6>
+            </div>
+          </div>
+          <hr>`);
+        });
+        
+      });
+
+      socket.on("server-send-message", function(data) {
+        const {username, message} = data;
+        $("#list-message").append(`<div class="row no-gutters">
+            <div class="col-md">
+              <p>${username} :</p>
+              <div class="chat-bubble chat-bubble--left">
+                ${message}
+              </div>
+            </div>
+            </div>`);
+      });
+
+      $(document).ready(function () {
+        $("#login-box").show();
+        $("#chat-box").hide();
+
+        $("#btn-register").on("click", function () {
+          socket.emit("client-send-username", $("#txt-username").val());
+        });
+
+        $("#btn-logout").on("click", function () {
+          socket.emit("client-send-logout");
+          $("#login-box").show(1000);
+          $("#chat-box").hide(1000);
+        });
+
+        $("#btn-send-message").on("click", function () {
+          socket.emit("client-send-message", $("#txt-message").val());
+          $("#txt-message").val("");
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="login-box" class="settings-tray">
+        <h2>WHAT IS YOUR NAME?</h2>
+        <div class="input-wrapper">
+          <input id="txt-username" placeholder="Enter your name" type="text" style="font-size: larger;">
+          <button id="btn-register" type="button" class="btn btn-sm btn-primary">Register</button>
+        </div>
+        <div id="alert-fail"></div>
+      </div>
+
+      <div id="chat-box">
+        <div class="row no-gutters">
+          <div class="col-md-4 border-right">
+          
+  
+          <div class="user-online-title">
+            <h4>Users Online</h4>
+          </div>
+          <div id="list-user"></div>
+          
+          </div>
+          <div class="col-md-8" style="position: relative;">
+          <div class="settings-tray">
+            <div class="friend-drawer no-gutters friend-drawer--grey">
+              <img class="profile-image" src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg" alt="">
+              <div class="text">
+                <h6 id="current-user"></h6>
+              </div>
+              <span>
+                <button id="btn-logout" class="btn btn-secondary">Logout</button>
+              </span>
+            </div>
+          </div>
+          <div id="list-message" class="chat-panel">
+          </div>
+            <div class="row" style="
+                              position: absolute;
+                              bottom: 1px;
+                              right: 12px;
+                              left: 0px;">
+            <div class="col-12">
+              <div class="chat-box-tray" style="border-bottom-right-radius: 8px;">
+                <input id="txt-message" type="text" placeholder="Type your message here...">
+                <button id="btn-send-message" type="button" class="btn btn-primary">Send</button>
+              </div>
+            </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      
+      </div>
+    <script src="/javascripts/style.js"></script>
+    <!-- end container -->
+
+  </body>
+</html>
