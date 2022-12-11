@@ -1,44 +1,32 @@
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const db = require('../../models');
+const db = require("../../models");
 const models = db.sequelize.models;
 const Op = db.Sequelize.Op;
-const sendVerifyEmail = require('../../utils/sendVerifyEmail');
+const jwt = require("jsonwebtoken");
+const sendVerifyEmail = require("../../utils/sendVerifyEmail");
 
 class AuthService {
-    storeHashEmail = async(user) => {
-        const email = user.email;
-        const userId = user.id;
-        const hash = await bcrypt.hash(userId, saltRounds);
-        await this.sendVerifyEmail(email, hash);
-        await models.VerifyUser.create({
-            userId,
-            hash
-        });
-    }
+  generateHashUserIdToken = function (userId) {
+    return jwt.sign(
+      {
+        userId,
+      },
+      process.env.JWT_ACCESS_KEY,
+      { expiresIn: process.env.JWT_VERIFY_EXPIRATION }
+    );
+  };
 
-    sendVerifyEmail = async(email, hash) => {
-        try {
-            const link = `${process.env.BACKEND_BASE_URL}/auth/verify/${hash}`;
-            await sendVerifyEmail(email, "[Eye Deer] - Email Verification", link);
-        } catch (error) {
-            console.log("Send email error: " + error.message);
-        }
+  sendVerifyEmail = async (email, userId) => {
+    try {
+      const subject = "[Eye Deer] - Email Verification";
+      const content = `Please click on the link below to verify your email address. </br> This is required to confirm ownership of the email address.`;
+      const hash = this.generateHashUserIdToken(userId);
+      const link = `${process.env.BACKEND_BASE_URL}/auth/user/verify/${hash}`;
+      const rejectLink = `${process.env.BACKEND_BASE_URL}/auth/user/cancel/${hash}`;
+      await sendVerifyEmail(email, subject, content, link, rejectLink);
+    } catch (error) {
+      console.log("Send email error: " + error.message);
     }
-
-    activeUser = async (hash) => {
-        const userVerify = await models.VerifyUser.findOne({ where: { hash: hash } });
-        if(userVerify === null) {
-            console.log("Hash not found");
-        }
-        else {
-            await models.User.update(
-                {active: true},
-                {where: {id: userVerify.userId}}
-            );
-            await models.VerifyUser.destroy({where: {hash: hash}});
-        }
-    }
+  };
 }
 
-module.exports = new AuthService;
+module.exports = new AuthService();

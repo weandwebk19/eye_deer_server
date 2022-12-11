@@ -1,10 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const roleController = require('./roleController');
+const roleController = require("./roleController");
 
 // [GET] /roles
-router.get('/roles', async function(req, res, next) {
-    roleController.list(req, res);
+router.get("/", async function (req, res, next) {
+  roleController.list(req, res);
 });
 
 module.exports = router;
