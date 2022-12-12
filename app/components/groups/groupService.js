@@ -1,6 +1,8 @@
 const { raw } = require("express");
 const db = require("../../models");
 const models = db.sequelize.models;
+const sequelize = db.sequelize;
+const { QueryTypes } = require('sequelize');
 const Op = db.Sequelize.Op;
 
 class GroupService {
@@ -117,23 +119,36 @@ class GroupService {
   };
 
   getListPresentations = async (groupId) => {
-    const presentations = await models.Group_Presentation.findAll({
-      attributes: [],
-      include: [
-        {
-          model: models.Presentation,
-          as: "Presentation",
-        },
-      ],
-      where: {
-        groupId: groupId,
-      },
-      raw: false,
-    });
-    const presentationsResponse = presentations.map((presentation) => {
-      return presentation.Presentation;
-    });
-    return presentationsResponse;
+    // query with sequelize model
+    // const presentations = await models.Group_Presentation.findAll({
+    //   attributes: [],
+    //   include: [
+    //     {
+    //       model: models.Presentation,
+    //       as: "Presentation",
+    //     },
+    //   ],
+    //   where: {
+    //     groupId: groupId,
+    //   },
+    //   raw: false,
+    // });
+    // const presentationsResponse = presentations.map((presentation) => {
+    //   return presentation.Presentation;
+    // });
+    // return presentationsResponse;
+
+    //query with sql
+    const sql =
+      `select presentations.*,  count(slides.id) as quizzes
+      from group_presentations join presentations on group_presentations.presentationId = presentations.id
+      left join slides on presentations.id = slides.presentationId
+      where group_presentations.groupId = ${groupId}
+      group by presentations.id`;
+
+      const presentations =  await sequelize.query(sql, { type: QueryTypes.SELECT });
+
+      return presentations.length === 0 ? null : presentations;
   };
 
   isJoinedGroup = async (groupId, userId) => {
