@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         as: "Presentation",
         constraints: false,
       });
+
+      this.hasOne(models.SlideType, {
+        foreignKey: "typeId",
+        as: "SlideType",
+        constraints: false,
+      });
     }
   }
   Slide.init(
