@@ -12,4 +12,9 @@ router.get("/:id/code", function (req, res, next) {
   PresentationController.getCodePresentation(req, res);
 });
 
+// Get slide list of presentation
+router.get("/:id/slides", function (req, res, next) {
+  PresentationController.getSlidesPresentation(req, res);
+});
+
 module.exports = router;
