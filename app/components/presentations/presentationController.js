@@ -58,6 +58,26 @@ class PresentationController {
       });
     }
   };
+
+  removePresentation = async (req, res) => {
+    try{
+      const presentationId = req.params.id;
+      
+      await presentationService.removePresentation(presentationId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Presentation was deleted!",
+      })
+    }
+    catch(error){
+      console.log(error);
+      return res.status(500).json({
+        success: false, 
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new PresentationController();

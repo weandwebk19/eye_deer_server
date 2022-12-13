@@ -12,4 +12,9 @@ router.get("/:id/code", function (req, res, next) {
   PresentationController.getCodePresentation(req, res);
 });
 
+// remove presentation
+router.post("/:id/remove", function (req, res, next) {
+  PresentationController.removePresentation(req, res);
+});
+
 module.exports = router;

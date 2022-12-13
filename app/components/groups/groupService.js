@@ -143,12 +143,12 @@ class GroupService {
       `select presentations.*,  count(slides.id) as quizzes
       from group_presentations join presentations on group_presentations.presentationId = presentations.id
       left join slides on presentations.id = slides.presentationId
-      where group_presentations.groupId = ${groupId}
+      where group_presentations.groupId = ${groupId} and presentations.deletedAt is null
       group by presentations.id`;
 
       const presentations =  await sequelize.query(sql, { type: QueryTypes.SELECT });
 
-      return presentations.length === 0 ? null : presentations;
+      return presentations;
   };
 
   isJoinedGroup = async (groupId, userId) => {
