@@ -13,6 +13,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        name: "My Second Presentation",
+        userCreated: "8088aa7e-c24d-4b74-9a68-012196c87417",
+        code: "123456",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
