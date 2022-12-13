@@ -24,6 +24,9 @@ module.exports = {
       presentationId: {
         type: Sequelize.INTEGER,
       },
+      contentId: {
+        type: Sequelize.INTEGER,
+      },
       note: {
         type: Sequelize.STRING,
       },

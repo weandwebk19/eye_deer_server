@@ -44,6 +44,17 @@ class PresentationService {
 
     return presentation;
   };
+
+  removePresentation = async (presentationId) => {
+    // soft delete all slide of this presentation. Currently, This does not exist slides, handle later
+
+    // soft delte presentation
+    await models.Presentation.destroy({
+      where: {
+        id: presentationId,
+      }
+    });
+  }
 }
 
 module.exports = new PresentationService();
