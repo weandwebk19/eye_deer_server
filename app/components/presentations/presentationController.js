@@ -60,7 +60,7 @@ class PresentationController {
     }
   };
 
-  // [GET] /presenataions/:id/code
+  // [GET] /presenataions/:id/slides
   getSlidesPresentation = async function (req, res) {
     try {
       const presentationId = req.params.id;

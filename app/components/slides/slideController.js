@@ -5,11 +5,14 @@ class SlideController {
     try {
       const slideName = req.body.slideName;
       const presentationId = req.body.presentationId;
+      const index = req.body.index;
+      const typeId = req.body.typeId;
 
       const newSlide = await sildeService.createSlide({
         name: slideName,
+        index: index,
         presentationId: presentationId,
-        typeId: 1, // TODO : create new type and assign id in here
+        typeId: typeId, // TODO : create new type and assign id in here
         customizeId: 1, // TODO: create new customize and assign id in here
         note: "",
       });
