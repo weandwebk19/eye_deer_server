@@ -2,33 +2,21 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Slides", {
+    await queryInterface.createTable("MultipleChoices", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
+      question: {
         type: Sequelize.STRING,
       },
-      index: {
-        type: Sequelize.INTEGER,
-      },
-      typeId: {
-        type: Sequelize.INTEGER,
-      },
-      customizeId: {
-        type: Sequelize.INTEGER,
-      },
-      presentationId: {
-        type: Sequelize.INTEGER,
-      },
-      contentId: {
-        type: Sequelize.INTEGER,
-      },
-      note: {
+      image: {
         type: Sequelize.STRING,
+      },
+      layoutId: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
@@ -41,6 +29,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Slides");
+    await queryInterface.dropTable("MultipleChoices");
   },
 };

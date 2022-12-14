@@ -3,16 +3,22 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert("Group_Presentations", [
+    return queryInterface.bulkInsert("SlideTypes", [
       {
-        presentationId: 1,
-        groupId: 1,
+        id: 1,
+        name: "Multiple Choice",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        presentationId: 2,
-        groupId: 1,
+        id: 2,
+        name: "Heading",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 3,
+        name: "Paragraph",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -20,6 +26,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("Group_Presentations", null, {});
+    return queryInterface.bulkDelete("SlideTypes", null, {});
   },
 };

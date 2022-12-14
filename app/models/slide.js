@@ -14,6 +14,28 @@ module.exports = (sequelize, DataTypes) => {
         as: "Presentation",
         constraints: false,
       });
+
+      this.hasOne(models.SlideType, {
+        foreignKey: "typeId",
+        as: "SlideType",
+        constraints: false,
+      });
+
+      this.hasOne(models.MultipleChoice, {
+        foreignKey: "contentId",
+        as: "MultipleChoice",
+        constraints: false,
+      });
+      this.hasOne(models.Heading, {
+        foreignKey: "contentId",
+        as: "Heading",
+        constraints: false,
+      });
+      this.hasOne(models.Paragraph, {
+        foreignKey: "contentId",
+        as: "Paragraph",
+        constraints: false,
+      });
     }
   }
   Slide.init(
@@ -23,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       typeId: DataTypes.INTEGER,
       customizeId: DataTypes.INTEGER,
       presentationId: DataTypes.INTEGER,
+      contentId: DataTypes.INTEGER,
       note: DataTypes.STRING,
     },
     {
