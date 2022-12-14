@@ -3,11 +3,11 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert("Headings", [
+    return queryInterface.bulkInsert("Paragraphs", [
       {
         id: 1,
-        heading: "Heading",
-        subHeading: "What is your favorite subject? subHeading",
+        heading: "Paragraph",
+        paragraph: "What is your favorite subject? paragraph",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -15,6 +15,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("Headings", null, {});
+    return queryInterface.bulkDelete("Paragraphs", null, {});
   },
 };
