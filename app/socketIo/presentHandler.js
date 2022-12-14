@@ -26,6 +26,7 @@ module.exports = (io, socket) => {
       JSON.stringify({
         presentationId,
         slideId,
+        host: socket.id,
       })
     );
     console.log("rediscl", await rediscl.get(code));
@@ -35,7 +36,7 @@ module.exports = (io, socket) => {
   const endPresent = async (data) => {
     console.log("end present", data);
     rediscl.del(data);
-    io.sockets.in(data).emit("PARTICIPANT_END_PRESENT", slideId);
+    io.sockets.in(data).emit("PARTICIPANT_END_PRESENT");
     // console.log("rediscl", await rediscl.get(data));
     // console.log(socket.adapter.rooms);
   };
@@ -53,8 +54,20 @@ module.exports = (io, socket) => {
     io.sockets.in(code).emit("PARTICIPANT_MOVE_TO_SLIDE", slideId);
   };
 
+  const increaseVote = async (data) => {
+    console.log("increaseVote", data);
+    const room = await rediscl.get(data.code);
+    if (room) {
+      const roomInfo = JSON.parse(room);
+      console.log("roomInfo", roomInfo);
+      const host = roomInfo.host;
+      io.sockets.to(host).emit("SERVER_SEND_INCREASE_VOTE", data);
+    }
+  };
+
   socket.on("CLIENT_SEND_JOIN_PRESENTATION", userJoinPresent);
   socket.on("HOST_START_PRESENT", startPresent);
   socket.on("HOST_END_PRESENT", endPresent);
   socket.on("HOST_MOVE_TO_SLIDE", moveToSlide);
+  socket.on("PARTICIPANT_SEND_INCREASE_VOTE", increaseVote);
 };

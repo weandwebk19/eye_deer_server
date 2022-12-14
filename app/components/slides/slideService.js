@@ -70,6 +70,41 @@ class SlideService {
     });
     return option;
   };
+
+  getSlideByIdAndPresentationId = async (slideId, presentationId) => {
+    const slide = await models.Slide.findOne({
+      raw: true,
+      where: {
+        presentationId: presentationId,
+        id: slideId,
+      },
+    });
+    return slide;
+  };
+
+  // getOptionBy = async (slideId, presentationId) => {
+  //   const slide = await models.Slide.findOne({
+  //     raw: true,
+  //     where: {
+  //       presentationId: presentationId,
+  //       id: slideId,
+  //     },
+  //   });
+  //   return slide;
+  // };
+
+  increaseVote = async (contentId, optionId, newVote) => {
+    const option = await models.Option.update(
+      { vote: newVote },
+      {
+        where: {
+          id: optionId,
+          contentId,
+        },
+      }
+    );
+    return option;
+  };
 }
 
 module.exports = new SlideService();

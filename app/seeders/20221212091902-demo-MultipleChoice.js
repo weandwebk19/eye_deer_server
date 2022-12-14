@@ -6,7 +6,7 @@ module.exports = {
     return queryInterface.bulkInsert("MultipleChoices", [
       {
         id: 1,
-        question: "Where is your favorite subject?",
+        question: "What is your favorite subject?",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
