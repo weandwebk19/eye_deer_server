@@ -1,5 +1,7 @@
+const HeadingService = require("../heading/HeadingService");
+const MultipleChoiceService = require("../multiplechoice/MultipleChoiceService");
+const ParagraphService = require("../paragraph/ParagraphService");
 const slideService = require("./slideService");
-const sildeService = require("./slideService");
 class SlideController {
   // [POST] /slides/create
   createSlide = async function (req, res) {
@@ -8,15 +10,38 @@ class SlideController {
       const presentationId = req.body.presentationId;
       const index = req.body.index;
       const typeId = req.body.typeId;
+      const content = req.body.content;
+      let newContent;
+      console.log("--------------------------------------");
+      console.log(typeId);
 
-      const newSlide = await sildeService.createSlide({
+      switch (typeId) {
+        case 1:
+          newContent = await MultipleChoiceService.createMultipleChoice(
+            content
+          );
+
+          break;
+        case 2:
+          newContent = await HeadingService.createHeading(content);
+          break;
+        case 3:
+          newContent = await ParagraphService.createParagraph(content);
+          break;
+        default:
+          break;
+      }
+
+      const newSlide = await slideService.createSlide({
         name: slideName,
         index: index,
         presentationId: presentationId,
         typeId: typeId, // TODO : create new type and assign id in here
         customizeId: 1, // TODO: create new customize and assign id in here
         note: "",
+        contentId: newContent.id,
       });
+      console.log(newSlide);
 
       return res.status(201).json({
         success: true,

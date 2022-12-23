@@ -2,7 +2,7 @@ const { raw } = require("express");
 const db = require("../../models");
 const models = db.sequelize.models;
 const sequelize = db.sequelize;
-const { QueryTypes } = require('sequelize');
+const { QueryTypes } = require("sequelize");
 const Op = db.Sequelize.Op;
 
 class GroupService {
@@ -139,16 +139,17 @@ class GroupService {
     // return presentationsResponse;
 
     //query with sql
-    const sql =
-      `select presentations.*,  count(slides.id) as quizzes
+    const sql = `select presentations.*,  count(slides.id) as slides
       from group_presentations join presentations on group_presentations.presentationId = presentations.id
       left join slides on presentations.id = slides.presentationId
       where group_presentations.groupId = ${groupId} and presentations.deletedAt is null
       group by presentations.id`;
 
-      const presentations =  await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const presentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
-      return presentations;
+    return presentations;
   };
 
   isJoinedGroup = async (groupId, userId) => {
