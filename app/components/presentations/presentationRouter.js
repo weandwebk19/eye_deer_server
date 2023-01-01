@@ -18,8 +18,8 @@ router.get("/:id/slides", function (req, res, next) {
 });
 
 // remove presentation
-router.post("/:id/remove", function (req, res, next) {
-  PresentationController.removePresentation(req, res);
+router.post("/removeInGroup", function (req, res, next) {
+  PresentationController.removePresentationInGroup(req, res);
 });
 
 module.exports = router;

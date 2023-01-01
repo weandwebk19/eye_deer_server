@@ -132,11 +132,11 @@ class PresentationController {
     }
   };
 
-  removePresentation = async (req, res) => {
+  removePresentationInGroup = async (req, res) => {
     try {
-      const presentationId = req.params.id;
+      const {groupId, presentationId} = req.body;
 
-      await presentationService.removePresentation(presentationId);
+      await presentationService.removePresentationInGroup(groupId, presentationId);
 
       return res.status(200).json({
         success: true,

@@ -45,13 +45,12 @@ class PresentationService {
     return presentation;
   };
 
-  removePresentation = async (presentationId) => {
-    // soft delete all slide of this presentation. Currently, This does not exist slides, handle later
-
-    // soft delte presentation
-    await models.Presentation.destroy({
+  removePresentationInGroup = async (groupId, presentationId) => {
+    //remove reference to group of presentation in group_presentations table
+    await models.Group_Presentation.destroy({
       where: {
-        id: presentationId,
+        groupId,
+        presentationId,
       },
     });
   };
