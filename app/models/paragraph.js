@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Paragraph.init(
     {
+      slideId: DataTypes.INTEGER,
       heading: DataTypes.STRING,
       paragraph: DataTypes.STRING,
       image: DataTypes.STRING,

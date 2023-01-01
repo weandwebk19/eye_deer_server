@@ -52,9 +52,9 @@ class PresentationService {
     await models.Presentation.destroy({
       where: {
         id: presentationId,
-      }
+      },
     });
-  }
+  };
 }
 
 module.exports = new PresentationService();
