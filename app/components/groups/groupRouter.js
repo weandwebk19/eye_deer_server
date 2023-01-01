@@ -3,6 +3,7 @@ const router = express.Router();
 const groupController = require("./groupController");
 const authMiddleware = require("../../components/auth/authMiddleware");
 const upload = require("../../utils/multer");
+const groupMiddleware = require("./groupMiddleware");
 
 // Get the information of group by id
 router.get("/:id", function (req, res, next) {
@@ -61,6 +62,11 @@ router.put("/:id/co-owner/:userId/assign", function (req, res, next) {
 // Kick-out a member of a group
 router.delete("/:id/members/:userId/kickout", function (req, res, next) {
   groupController.kickOutMember(req, res);
+});
+
+// Get user role in group
+router.get("/:id/role", function (req, res, next) {
+  groupController.getRoleInGroup(req, res);
 });
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const PresentationController = require("./PresentationController");
+const groupMiddleware = require('../groups/groupMiddleware');
 
 // Create new presentation
 router.post("/create", function (req, res, next) {
@@ -18,7 +19,7 @@ router.get("/:id/slides", function (req, res, next) {
 });
 
 // remove presentation
-router.post("/removeInGroup", function (req, res, next) {
+router.post("/removeInGroup", groupMiddleware.isOwner, function (req, res, next) {
   PresentationController.removePresentationInGroup(req, res);
 });
 
