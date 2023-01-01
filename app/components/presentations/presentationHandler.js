@@ -1,10 +1,14 @@
-const rediscl = require("../redis");
+const rediscl = require("../../redis");
+const presentationService = require("./presentationService");
 
 module.exports = (io, socket) => {
   const userJoinPresent = async (data) => {
-    console.log("data", data);
     socket.join(data.code);
     const currentPresentation = await rediscl.get(data.code);
+    const presentation = presentationService.getPresentationById(
+      currentPresentation.presentationId
+    );
+
     if (currentPresentation && data) {
       socket.emit("SERVER_SEND_JOIN_SUCCESS", data, currentPresentation);
     } else {

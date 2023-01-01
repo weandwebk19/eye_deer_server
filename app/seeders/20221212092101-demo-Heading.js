@@ -6,6 +6,7 @@ module.exports = {
     return queryInterface.bulkInsert("Headings", [
       {
         id: 1,
+        slideId: 2,
         heading: "Heading",
         subHeading: "What is your favorite subject? subHeading",
         createdAt: new Date(),

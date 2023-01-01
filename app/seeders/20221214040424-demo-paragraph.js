@@ -6,6 +6,7 @@ module.exports = {
     return queryInterface.bulkInsert("Paragraphs", [
       {
         id: 1,
+        slideId: 3,
         heading: "Paragraph",
         paragraph: "What is your favorite subject? paragraph",
         createdAt: new Date(),

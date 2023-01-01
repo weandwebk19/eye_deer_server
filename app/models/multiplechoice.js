@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   MultipleChoice.init(
     {
+      slideId: DataTypes.INTEGER,
       question: DataTypes.STRING,
       image: DataTypes.STRING,
       layoutId: DataTypes.INTEGER,
