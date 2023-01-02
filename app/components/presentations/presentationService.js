@@ -54,6 +54,38 @@ class PresentationService {
       },
     });
   };
+
+  createUserVoted = async (userVoted) => {
+    const newResource = await models.UserVoted.create(userVoted);
+    console.log("newResource", newResource);
+
+    return newResource;
+  };
+
+  countUserVoted = async (userVoted) => {
+    const findResource = await models.UserVoted.count({
+      where: {
+        presentationId: userVoted.presentationId,
+        slideId: userVoted.slideId,
+        userId: userVoted.userId,
+      },
+      raw: true,
+    });
+
+    return findResource;
+  };
+
+  deleteUserVoted = async (userVoted) => {
+    const findResource = await models.UserVoted.destroy({
+      where: {
+        presentationId: userVoted.presentationId,
+        slideId: userVoted.slideId,
+      },
+      force: true,
+    });
+
+    return findResource;
+  };
 }
 
 module.exports = new PresentationService();

@@ -61,10 +61,11 @@ class SlideController {
     try {
       const { presentationId, slideId, optionId, newVote } = req.body;
 
-      const slide = await sildeService.getSlideByIdAndPresentationId(
+      const slide = await slideService.getSlideByIdAndPresentationId(
         slideId,
         presentationId
       );
+      console.log(slide);
       if (slide) {
         if (slide.typeId !== 1) {
           return res.status(406).json({
@@ -75,7 +76,7 @@ class SlideController {
 
         const option = await slideService.updateOption({
           id: optionId,
-          constentId: slide.contentId,
+          contentId: slide.contentId,
           vote: newVote,
         });
 

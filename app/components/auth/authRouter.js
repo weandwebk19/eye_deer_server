@@ -9,11 +9,6 @@ router.post("/", authMiddleware.verifyToken, function (req, res, next) {
   res.status(200).json("Authentication successfully");
 });
 
-// [GET] /register
-router.get("/register", function (req, res, next) {
-  res.send("register");
-});
-
 // [POST] /register
 router.post("/register", function (req, res, next) {
   authController.register(req, res);
@@ -66,6 +61,11 @@ router.get("/user/verify", function (req, res, next) {
 // [GET] /auth/user/cancel?token=xxx
 router.get("/user/cancel", function (req, res, next) {
   authController.cancelEmail(req, res);
+});
+
+// Anonymous login get access token to play game
+router.post("/user/anonymous/login", function (req, res, next) {
+  authController.anonymousLogin(req, res);
 });
 
 module.exports = router;
