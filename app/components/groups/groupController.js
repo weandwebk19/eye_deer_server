@@ -3,6 +3,7 @@ const groupService = require("./groupService");
 const userService = require("../users/userService");
 const sendEmail = require("../../utils/sendVerifyEmail");
 const jwt = require("jsonwebtoken");
+const { getRole } = require("./groupService");
 
 class GroupController {
   //[GET] /groups/:id
@@ -410,6 +411,27 @@ class GroupController {
       });
     }
   };
+
+  getRoleInGroup = async (req, res) => {
+    try{
+      const userId = req.user.id;
+      const groupId = req.params.id;
+
+      const roleType = await groupService.getRole(groupId, userId);
+      res.status(200).json({
+        success: true,
+        message: "Get role successfully",
+        data: {roleType},
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      })
+    }
+  }
 }
 
 module.exports = new GroupController();
