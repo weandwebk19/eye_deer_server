@@ -18,7 +18,7 @@ router.get("/:id/slides", function (req, res, next) {
   PresentationController.getSlidesPresentation(req, res);
 });
 
-// remove presentation
+// remove presentation in group
 router.post("/removeInGroup", groupMiddleware.isOwner, function (req, res, next) {
   PresentationController.removePresentationInGroup(req, res);
 });
@@ -30,5 +30,25 @@ router.get(
     PresentationController.getUserVoted(req, res);
   }
 );
+
+// remove presentation
+router.post("/remove", function (req, res, next) {
+  PresentationController.removePresentation(req, res);
+});
+
+// get my presentation
+router.get("/my-presentations" , function (req, res, next) {
+  PresentationController.getMyPresentations(req, res);
+});
+
+// get my co-presentation
+router.get("/my-co-presentations" , function (req, res, next) {
+  PresentationController.getMyCoPresentations(req, res);
+});
+
+// find presentation by name
+router.post("/find-by-name" , function (req, res, next) {
+  PresentationController.findPresentationsByName(req, res);
+});
 
 module.exports = router;

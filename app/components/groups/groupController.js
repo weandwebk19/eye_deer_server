@@ -432,6 +432,34 @@ class GroupController {
       })
     }
   }
+
+  addPresentationToGroup = async (req, res) => {
+    try{
+      const {groupId, presentationId} = req.body;
+      const status = await groupService.addPresentationToGroup(groupId, presentationId);
+
+      if(!status){
+        res.status(400).json({
+          success: false,
+          message: "Presentation is already in group"
+        })
+
+        return;
+      }
+      
+      res.status(200).json({
+        success: true,
+        message: "Add presentation successfully",
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      })
+    }
+  }
 }
 
 module.exports = new GroupController();

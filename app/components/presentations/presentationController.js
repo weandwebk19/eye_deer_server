@@ -1,3 +1,4 @@
+const groupService = require("../groups/groupService");
 const slideService = require("../slides/slideService");
 const presentationService = require("./presentationService");
 class PresentationController {
@@ -5,7 +6,6 @@ class PresentationController {
   createPresentation = async function (req, res) {
     try {
       const presentationName = req.body.presentationName;
-      const groupId = req.body.groupId;
       const userId = req.user.id;
 
       const newPresentation = await presentationService.createPresentation({
@@ -13,10 +13,11 @@ class PresentationController {
         userCreated: userId,
       });
 
-      await presentationService.creategroupPresentation({
-        groupId: groupId,
-        presentationId: newPresentation.id,
-      });
+      // add presentation to group if exist groupId
+      const groupId = req.body.groupId;
+      if(groupId){
+        groupService.addPresentationToGroup(groupId, newPresentation.id);
+      }
 
       return res.status(201).json({
         success: true,
@@ -184,6 +185,89 @@ class PresentationController {
       });
     }
   };
+  removePresentation = async (req, res) => {
+    try {
+      const {presentationId} = req.body;
+      const userId = req.user.id;
+
+      await presentationService.removePresentation(presentationId, userId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Presentation was deleted!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  getMyPresentations = async (req, res) => {
+    try{
+      const userId = req.user.id;
+
+      const presentations = await presentationService.getPresentationsOfUser(userId);
+      
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {presentations}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+    }
+  }
+
+  getMyCoPresentations = async (req, res) => {
+    try{
+      const userId = req.user.id;
+
+      const coPresentations = await presentationService.getCoPresentationsOfUser(userId);
+      
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {coPresentations}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+    }
+  }
+
+  findPresentationsByName = async (req, res) => {
+    try{
+      const userId = req.user.id;
+      const namePresentation = req.body.namePresentation;
+
+      const presentations = await presentationService.findPresentationsByName(userId, namePresentation);
+      
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {presentations}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+    }
+  }
 }
 
 module.exports = new PresentationController();
