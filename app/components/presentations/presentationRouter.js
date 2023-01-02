@@ -23,6 +23,14 @@ router.post("/removeInGroup", groupMiddleware.isOwner, function (req, res, next)
   PresentationController.removePresentationInGroup(req, res);
 });
 
+// Get user voted
+router.get(
+  "/:id/slides/:slideId/users/:userId/voted",
+  function (req, res, next) {
+    PresentationController.getUserVoted(req, res);
+  }
+);
+
 // remove presentation
 router.post("/remove", function (req, res, next) {
   PresentationController.removePresentation(req, res);

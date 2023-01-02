@@ -152,6 +152,39 @@ class PresentationController {
     }
   };
 
+  // [GET] /presenataions/:id/slides/:slideId/users/:userId
+  getUserVoted = async function (req, res) {
+    try {
+      const presentationId = req.params.id;
+      const slideId = req.params.slideId;
+      const userId = req.params.userId;
+
+      const userVoted = await presentationService.countUserVoted({
+        presentationId,
+        slideId,
+        userId,
+      });
+      console.log("userVoted", userVoted);
+      if (userVoted > 0) {
+        return res.status(200).json({
+          success: true,
+          message: "Get is user voted successfully.",
+          data: true,
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          message: "Get is user voted successfully.",
+          data: false,
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
   removePresentation = async (req, res) => {
     try {
       const {presentationId} = req.body;

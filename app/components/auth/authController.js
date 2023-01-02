@@ -262,6 +262,32 @@ class AuthController {
         );
     }
   };
+
+  generateVerifyToken = function (user) {
+    return jwt.sign(
+      {
+        id: user.id,
+      },
+      process.env.JWT_ACCESS_KEY,
+      { expiresIn: process.env.JWT_VERIFY_EXPIRATION }
+    );
+  };
+
+  //[POST] auth/user/anonymous/login
+  anonymousLogin = async function (req, res) {
+    try {
+      const user = req.body.user;
+      const accessToken = this.generateVerifyToken(user);
+
+      res.status(200).json({
+        user,
+        accessToken,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: err.message });
+    }
+  };
 }
 
 module.exports = new AuthController();
