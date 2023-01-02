@@ -1,3 +1,4 @@
+const groupService = require("../groups/groupService");
 const slideService = require("../slides/slideService");
 const presentationService = require("./presentationService");
 class PresentationController {
@@ -5,7 +6,6 @@ class PresentationController {
   createPresentation = async function (req, res) {
     try {
       const presentationName = req.body.presentationName;
-      const groupId = req.body.groupId;
       const userId = req.user.id;
 
       const newPresentation = await presentationService.createPresentation({
@@ -13,10 +13,11 @@ class PresentationController {
         userCreated: userId,
       });
 
-      await presentationService.creategroupPresentation({
-        groupId: groupId,
-        presentationId: newPresentation.id,
-      });
+      // add presentation to group if exist groupId
+      const groupId = req.body.groupId;
+      if(groupId){
+        groupService.addPresentationToGroup(groupId, newPresentation.id);
+      }
 
       return res.status(201).json({
         success: true,

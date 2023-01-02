@@ -82,9 +82,10 @@ class PresentationService {
   }
 
   findPresentationsByName = async (userId, namePresentation) => {
-    const sql = `select *
-                from presentations
-                where presentations.userCreated = '${userId}' and presentations.name like '%${namePresentation}%'`;
+    const sql = `select presentations.*, count(slides.id) as slides
+                from presentations join slides on presentations.id = slides.presentationId
+                where presentations.userCreated = '${userId}' and presentations.name like '%${namePresentation}%'
+                group by presentations.id`;
 
     const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
 
