@@ -268,6 +268,31 @@ class GroupService {
       return err;
     }
   };
+
+  addPresentationToGroup = async (groupId, presentationId) => {
+    try {
+      const presentation = await models.Group_Presentation.findOne({
+        raw: true,
+        where: {
+          groupId,
+          presentationId
+        },
+      })
+      if(presentation){
+        return false;
+      }
+      
+      await models.Group_Presentation.create({
+        groupId,
+        presentationId
+      })
+
+      return true;      
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+  };
 }
 
 module.exports = new GroupService();
