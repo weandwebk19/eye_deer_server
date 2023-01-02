@@ -69,4 +69,9 @@ router.get("/:id/role", function (req, res, next) {
   groupController.getRoleInGroup(req, res);
 });
 
+// Add presentation to group
+router.post("/:id/add-presentation", function (req, res, next) {
+  groupController.addPresentationToGroup(req, res);
+});
+
 module.exports = router;

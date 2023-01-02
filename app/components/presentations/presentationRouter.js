@@ -23,4 +23,19 @@ router.post("/removeInGroup", groupMiddleware.isOwner, function (req, res, next)
   PresentationController.removePresentationInGroup(req, res);
 });
 
+// get my presentation
+router.get("/my-presentations" , function (req, res, next) {
+  PresentationController.getMyPresentations(req, res);
+});
+
+// get my co-presentation
+router.get("/my-co-presentations" , function (req, res, next) {
+  PresentationController.getMyCoPresentations(req, res);
+});
+
+// find presentation by name
+router.post("/find-by-name" , function (req, res, next) {
+  PresentationController.findPresentationsByName(req, res);
+});
+
 module.exports = router;

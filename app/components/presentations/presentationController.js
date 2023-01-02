@@ -150,6 +150,70 @@ class PresentationController {
       });
     }
   };
+
+  getMyPresentations = async (req, res) => {
+    try{
+      const userId = req.user.id;
+
+      const presentations = await presentationService.getPresentationsOfUser(userId);
+      
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {presentations}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+    }
+  }
+
+  getMyCoPresentations = async (req, res) => {
+    try{
+      const userId = req.user.id;
+
+      const coPresentations = await presentationService.getCoPresentationsOfUser(userId);
+      
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {coPresentations}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+    }
+  }
+
+  findPresentationsByName = async (req, res) => {
+    try{
+      const userId = req.user.id;
+      const namePresentation = req.body.namePresentation;
+
+      const presentations = await presentationService.findPresentationsByName(userId, namePresentation);
+      
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {presentations}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+    }
+  }
 }
 
 module.exports = new PresentationController();
