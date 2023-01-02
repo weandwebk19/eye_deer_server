@@ -40,4 +40,9 @@ router.delete("/:id/content/:contentId/delete", function (req, res, next) {
   SlideController.deleteSlideContent(req, res);
 });
 
+// Delete a slide
+router.delete("/:id/delete", function (req, res, next) {
+  SlideController.deleteSlide(req, res);
+});
+
 module.exports = router;
