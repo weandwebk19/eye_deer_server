@@ -57,10 +57,20 @@ class PresentationService {
     });
   };
 
+  removePresentation = async (presentationId, userId) => {
+    //soft remove presentation 
+    await models.Presentation.destroy({
+      where: {
+        id: presentationId,
+        userCreated: userId
+      },
+    });
+  };
+
   getPresentationsOfUser = async (userId) => {
     const sql = `select presentations.*, count(slides.id) as slides
                 from presentations left join slides on presentations.id = slides.presentationId
-                where presentations.userCreated = '${userId}'
+                where presentations.userCreated = '${userId}' and presentations.deletedAt is null
                 group by presentations.id`;
 
     const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
@@ -74,6 +84,7 @@ class PresentationService {
                 join group_presentations on presentations.id = group_presentations.presentationId
                 join group_users on group_presentations.groupId = group_users.groupId and group_users.userId = '${userId}'
                 where group_users.roleId = 2 and presentations.userCreated != '${userId}'
+                and presentations.deletedAt is null
                 group by presentations.id`;
 
     const coPresentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
@@ -85,6 +96,7 @@ class PresentationService {
     const sql = `select presentations.*, count(slides.id) as slides
                 from presentations join slides on presentations.id = slides.presentationId
                 where presentations.userCreated = '${userId}' and presentations.name like '%${namePresentation}%'
+                and presentations.deletedAt is null
                 group by presentations.id`;
 
     const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });

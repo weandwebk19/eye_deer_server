@@ -18,9 +18,14 @@ router.get("/:id/slides", function (req, res, next) {
   PresentationController.getSlidesPresentation(req, res);
 });
 
-// remove presentation
+// remove presentation in group
 router.post("/removeInGroup", groupMiddleware.isOwner, function (req, res, next) {
   PresentationController.removePresentationInGroup(req, res);
+});
+
+// remove presentation
+router.post("/remove", function (req, res, next) {
+  PresentationController.removePresentation(req, res);
 });
 
 // get my presentation
