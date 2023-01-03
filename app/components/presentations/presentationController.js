@@ -5,12 +5,13 @@ class PresentationController {
   // [POST] /presenataions/create
   createPresentation = async function (req, res) {
     try {
-      const presentationName = req.body.presentationName;
+      const { presentationName, status } = req.body;
       const userId = req.user.id;
 
       const newPresentation = await presentationService.createPresentation({
         name: presentationName,
         userCreated: userId,
+        status,
       });
 
       // add presentation to group if exist groupId
