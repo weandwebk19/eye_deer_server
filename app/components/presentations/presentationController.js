@@ -1,4 +1,5 @@
 const slideService = require("../slides/slideService");
+const userService = require("../users/userService");
 const presentationService = require("./presentationService");
 class PresentationController {
   // [POST] /presenataions/create
@@ -134,9 +135,12 @@ class PresentationController {
 
   removePresentationInGroup = async (req, res) => {
     try {
-      const {groupId, presentationId} = req.body;
+      const { groupId, presentationId } = req.body;
 
-      await presentationService.removePresentationInGroup(groupId, presentationId);
+      await presentationService.removePresentationInGroup(
+        groupId,
+        presentationId
+      );
 
       return res.status(200).json({
         success: true,
@@ -177,6 +181,40 @@ class PresentationController {
           data: false,
         });
       }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
+
+  // [GET] /presenataions/:id/chat/messages
+  getChatMessages = async function (req, res) {
+    try {
+      const presentationId = req.params.id;
+
+      const messages = await presentationService.getListChatMessage(
+        presentationId
+      );
+
+      const messagesResponse = await Promise.all(
+        messages.map(async (message) => {
+          const userInfo = await userService.getUserById(message.userId);
+          return {
+            ...message,
+            avatar: userInfo?.picture,
+            name: `${userInfo?.firstName ?? ""} ${userInfo?.lastName ?? ""}`,
+            messages: [message.content],
+          };
+        })
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Get list chat messages successfully.",
+        data: messagesResponse,
+      });
     } catch (err) {
       return res.status(500).json({
         success: false,

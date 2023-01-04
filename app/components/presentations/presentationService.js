@@ -86,6 +86,21 @@ class PresentationService {
 
     return findResource;
   };
+
+  createChatMessage = async (message) => {
+    const newResource = await models.ChatMessage.create(message);
+
+    return newResource;
+  };
+
+  getListChatMessage = async (presentationId) => {
+    const messages = await models.ChatMessage.findAll({
+      where: { presentationId },
+      raw: true,
+    });
+
+    return messages;
+  };
 }
 
 module.exports = new PresentationService();

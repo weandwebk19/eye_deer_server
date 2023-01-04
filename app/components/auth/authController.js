@@ -279,13 +279,18 @@ class AuthController {
       const user = req.body.user;
       const accessToken = this.generateVerifyToken(user);
 
-      res.status(200).json({
+      const userFind = await userService.getUserById(user.id);
+      if (!userFind) {
+        await userService.createUser({ ...user, password: "" });
+      }
+
+      return res.status(200).json({
         user,
         accessToken,
       });
     } catch (err) {
       console.log(err);
-      res.status(500).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
     }
   };
 }

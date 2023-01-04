@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const PresentationController = require("./PresentationController");
-const groupMiddleware = require('../groups/groupMiddleware');
+const groupMiddleware = require("../groups/groupMiddleware");
 
 // Create new presentation
 router.post("/create", function (req, res, next) {
@@ -19,9 +19,13 @@ router.get("/:id/slides", function (req, res, next) {
 });
 
 // remove presentation
-router.post("/removeInGroup", groupMiddleware.isOwner, function (req, res, next) {
-  PresentationController.removePresentationInGroup(req, res);
-});
+router.post(
+  "/removeInGroup",
+  groupMiddleware.isOwner,
+  function (req, res, next) {
+    PresentationController.removePresentationInGroup(req, res);
+  }
+);
 
 // Get user voted
 router.get(
@@ -30,5 +34,10 @@ router.get(
     PresentationController.getUserVoted(req, res);
   }
 );
+
+// Get list chat messages of presentation
+router.get("/:id/chat/messages", function (req, res, next) {
+  PresentationController.getChatMessages(req, res);
+});
 
 module.exports = router;
