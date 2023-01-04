@@ -51,4 +51,14 @@ router.post("/find-by-name" , function (req, res, next) {
   PresentationController.findPresentationsByName(req, res);
 });
 
+// find one presentation by id
+router.post("/find-by-id" , function (req, res, next) {
+  PresentationController.findPresentationById(req, res);
+});
+
+// update presentation
+router.post("/update", function (req, res, next) {
+  PresentationController.updatePresentation(req, res);
+});
+
 module.exports = router;

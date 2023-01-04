@@ -460,6 +460,25 @@ class GroupController {
       })
     }
   }
+
+  removeGroup = async (req, res) => {
+    try{
+      const {groupId} = req.body;
+      await groupService.removeGroup(groupId);
+      
+      res.status(200).json({
+        success: true,
+        message: "Remove successfully",
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      })
+    }
+  }
 }
 
 module.exports = new GroupController();

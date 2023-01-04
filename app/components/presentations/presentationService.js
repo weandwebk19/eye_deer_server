@@ -135,6 +135,14 @@ class PresentationService {
 
     return presentations;
   }
+
+  updatePresentation = async (presentationId, presentationName, status) => {
+    await models.Presentation.update({name: presentationName, status}, {
+      where: {
+        id: presentationId,
+      }
+    })
+  }
 }
 
 module.exports = new PresentationService();
