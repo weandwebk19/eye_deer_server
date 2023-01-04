@@ -39,7 +39,6 @@ class SlideController {
         note: "",
         contentId: newContent.id,
       });
-      console.log(newSlide);
 
       return res.status(201).json({
         success: true,
@@ -304,9 +303,12 @@ class SlideController {
   deleteSlide = async function (req, res) {
     try {
       const slideId = req.params.id;
-      const slide = await slideService.getSlideById(slideId);
 
       await slideService.deleteSlide(slideId);
+      return res.status(201).json({
+        success: true,
+        message: `Delete slide ${slideId} successfully.`,
+      });
     } catch (err) {
       return res.status(500).json({
         success: false,

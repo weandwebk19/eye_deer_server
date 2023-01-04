@@ -304,14 +304,12 @@ class SlideService {
   };
 
   deleteSlide = async (slideId) => {
-    const newContent = await models.Slide.destroy({
+    await models.Slide.destroy({
       force: true,
       where: {
         id: slideId,
       },
     });
-
-    return newContent;
   };
 }
 

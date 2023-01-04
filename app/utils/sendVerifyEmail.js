@@ -90,12 +90,12 @@ const sendEmail = async (email, subject, content, link, rejectLink) => {
                                               "Important!" +
                                               "</strong>" +
                                               "If it is not you, kindly cancel by" +
-                                              `<a href="${rejectLink}"> clicking here</a>.` +
+                                              `<a href="${rejectLink}"> click here</a>.` +
                                               "</p>" +
                                               '<p style="color:#292929; font-size:13px;line-height:24px; margin-top:35px;">' +
                                               "If you do not cancel your account information is still saved on our application. You will not be able to cancel after 7 days from the time we email you." +
                                               "</p > "
-                                            : null
+                                            : ""
                                         }
                                     </td>
                                 </tr>
