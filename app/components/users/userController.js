@@ -133,7 +133,7 @@ class UserController {
   verifyStatus = async (req, res) => {
     try {
       const user = req.user;
-      if (user !== undefined) {
+      if (user !== undefined && user.email !== undefined) {
         const status = await userService.getVerifyStatus(user.id);
         res.status(200).json(status);
       } else {

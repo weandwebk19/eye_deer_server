@@ -2,7 +2,7 @@ const db = require("../../models");
 const models = db.sequelize.models;
 const Op = db.Sequelize.Op;
 const sequelize = db.sequelize;
-const { QueryTypes } = require('sequelize');
+const { QueryTypes } = require("sequelize");
 const generatePresentationCode = require("../../utils/generatePresentationCode");
 
 class PresentationService {
@@ -88,13 +88,28 @@ class PresentationService {
 
     return findResource;
   };
-  
+
+  createChatMessage = async (message) => {
+    const newResource = await models.ChatMessage.create(message);
+
+    return newResource;
+  };
+
+  getListChatMessage = async (presentationId) => {
+    const messages = await models.ChatMessage.findAll({
+      where: { presentationId },
+      raw: true,
+    });
+
+    return messages;
+  };
+
   removePresentation = async (presentationId, userId) => {
-    //soft remove presentation 
+    //soft remove presentation
     await models.Presentation.destroy({
       where: {
         id: presentationId,
-        userCreated: userId
+        userCreated: userId,
       },
     });
   };
@@ -105,10 +120,12 @@ class PresentationService {
                 where presentations.userCreated = '${userId}' and presentations.deletedAt is null
                 group by presentations.id`;
 
-    const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const presentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
     return presentations;
-  }
+  };
 
   getCoPresentationsOfUser = async (userId) => {
     const sql = `select presentations.*, count(distinct(slides.id)) as slides
@@ -119,10 +136,12 @@ class PresentationService {
                 and presentations.deletedAt is null
                 group by presentations.id`;
 
-    const coPresentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const coPresentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
     return coPresentations;
-  }
+  };
 
   findPresentationsByName = async (userId, namePresentation) => {
     const sql = `select presentations.*, count(slides.id) as slides
@@ -131,18 +150,23 @@ class PresentationService {
                 and presentations.deletedAt is null
                 group by presentations.id`;
 
-    const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const presentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
     return presentations;
-  }
+  };
 
   updatePresentation = async (presentationId, presentationName, status) => {
-    await models.Presentation.update({name: presentationName, status}, {
-      where: {
-        id: presentationId,
+    await models.Presentation.update(
+      { name: presentationName, status },
+      {
+        where: {
+          id: presentationId,
+        },
       }
-    })
-  }
+    );
+  };
 }
 
 module.exports = new PresentationService();

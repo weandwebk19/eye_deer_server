@@ -1,5 +1,6 @@
 const rediscl = require("../../redis");
 const groupService = require("../groups/groupService");
+const userService = require("../users/userService");
 const presentationService = require("./presentationService");
 
 module.exports = (io, socket) => {
@@ -112,9 +113,28 @@ module.exports = (io, socket) => {
     }
   };
 
+  const handleCreateChatMessage = async (data) => {
+    try {
+      const { code, ...chatMessage } = data;
+      const newChatMessage = await presentationService.createChatMessage(
+        chatMessage
+      );
+      const userInfo = await userService.getUserById(chatMessage.userId);
+      io.sockets.in(code).emit("SERVER_SEND_CHAT_MESSAGE", {
+        ...newChatMessage.dataValues,
+        avatar: userInfo.picture,
+        name: `${userInfo.firstName ?? ""} ${userInfo?.lastName ?? ""}`,
+        messages: [newChatMessage.content],
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   socket.on("CLIENT_SEND_JOIN_PRESENTATION", userJoinPresent);
   socket.on("HOST_START_PRESENT", startPresent);
   socket.on("HOST_END_PRESENT", endPresent);
   socket.on("HOST_MOVE_TO_SLIDE", moveToSlide);
   socket.on("PARTICIPANT_SEND_INCREASE_VOTE", increaseVote);
+  socket.on("PARTICIPANT_SEND_MESSAGE", handleCreateChatMessage);
 };
