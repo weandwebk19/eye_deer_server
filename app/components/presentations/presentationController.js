@@ -6,12 +6,13 @@ class PresentationController {
   // [POST] /presenataions/create
   createPresentation = async function (req, res) {
     try {
-      const presentationName = req.body.presentationName;
+      const { presentationName, status } = req.body;
       const userId = req.user.id;
 
       const newPresentation = await presentationService.createPresentation({
         name: presentationName,
         userCreated: userId,
+        status,
       });
 
       // add presentation to group if exist groupId
@@ -300,6 +301,59 @@ class PresentationController {
         success: true,
         message: "Get successfully",
         data: { presentations },
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  };
+
+  findPresentationById = async (req, res) => {
+    try {
+      const presentationId = req.body.presentationId;
+
+      const presentation = await presentationService.getPresentationById(
+        presentationId
+      );
+
+      if (!presentation) {
+        res.status(400).json({
+          success: false,
+          message: "Presentation does not exist",
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: { presentation },
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  };
+
+  updatePresentation = async (req, res) => {
+    try {
+      const { presentationId, presentationName, status } = req.body;
+
+      await presentationService.updatePresentation(
+        presentationId,
+        presentationName,
+        status
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Update successfully",
       });
     } catch (error) {
       console.log(error);
