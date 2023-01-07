@@ -2,7 +2,7 @@ const { raw } = require("express");
 const db = require("../../models");
 const models = db.sequelize.models;
 const sequelize = db.sequelize;
-const { QueryTypes } = require('sequelize');
+const { QueryTypes } = require("sequelize");
 const Op = db.Sequelize.Op;
 
 class GroupService {
@@ -24,35 +24,20 @@ class GroupService {
   };
 
   getListOwnedGroup = async (userId) => {
-    const groups = await models.Group_User.findAll({
-      raw: false,
-      where: {
-        roleId: 1,
-        userId: userId,
-      },
-      include: [
-        {
-          model: models.Group,
-          as: "Group",
-        },
-      ],
-    });
-    const groupsResponse = await Promise.all(
-      groups.map(async (e) => {
-        const totalMembers = await this.getTotalMembers(e.Group.id);
-        return {
-          id: e.Group.id,
-          name: e.Group.name,
-          description: e.Group.description,
-          status: e.Group.status,
-          capacity: e.Group.capacity,
-          picture: e.Group.picture,
-          totalMembers: totalMembers,
-        };
-      })
-    );
+    const sqlGetDBName = 'select database() as DBName;';
+    const DBName = (await sequelize.query(sqlGetDBName, { type: QueryTypes.SELECT}))[0].DBName;
+    
+    const sql = 
+      `select ${DBName}.groups.*, count(group_users.userId) as totalMembers
+      from (select * from group_users where group_users.userId = '${userId}' and group_users.roleId = 1) as gr
+      join ${DBName}.groups on gr.groupId = ${DBName}.groups.id
+      join group_users on gr.groupId = group_users.groupId
+      where ${DBName}.groups.deletedAt is null
+      group by gr.groupId`;
 
-    return groupsResponse;
+    const groups = await sequelize.query(sql, { type: QueryTypes.SELECT});
+
+    return groups;
   };
 
   getListJoinedGroup = async (userId) => {
@@ -65,6 +50,9 @@ class GroupService {
       include: [
         {
           model: models.Group,
+          where: {
+            deletedAt: null,
+          },
           as: "Group",
         },
       ],
@@ -139,16 +127,17 @@ class GroupService {
     // return presentationsResponse;
 
     //query with sql
-    const sql =
-      `select presentations.*,  count(slides.id) as quizzes
+    const sql = `select presentations.*,  count(slides.id) as slides
       from group_presentations join presentations on group_presentations.presentationId = presentations.id
       left join slides on presentations.id = slides.presentationId
       where group_presentations.groupId = ${groupId} and presentations.deletedAt is null
       group by presentations.id`;
 
-      const presentations =  await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const presentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
-      return presentations;
+    return presentations;
   };
 
   isJoinedGroup = async (groupId, userId) => {
@@ -266,6 +255,37 @@ class GroupService {
       console.log(err);
       return err;
     }
+  };
+
+  addPresentationToGroup = async (groupId, presentationId) => {
+    try {
+      const presentation = await models.Group_Presentation.findOne({
+        raw: true,
+        where: {
+          groupId,
+          presentationId
+        },
+      })
+      if(presentation){
+        return false;
+      }
+      
+      await models.Group_Presentation.create({
+        groupId,
+        presentationId
+      })
+
+      return true;      
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+  };
+
+  removeGroup = async (groupId) => {
+    await models.Group.destroy({
+      where: { id: groupId},
+    });
   };
 }
 

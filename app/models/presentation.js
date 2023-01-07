@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       userCreated: DataTypes.UUID,
       code: DataTypes.STRING,
+      status: DataTypes.BOOLEAN,
     },
     {
       sequelize,

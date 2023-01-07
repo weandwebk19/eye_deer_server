@@ -73,17 +73,24 @@ class UserController {
 
   // [GET] users/:id/groups/owned
   ownedGroups = async function (req, res) {
-    const userId = req.params.id;
-    if (userId === undefined) {
-      res.status(404).json("User not found");
-      return;
-    }
-    const groups = await groupService.getListOwnedGroup(userId).catch((err) => {
-      res.status(500).json(err.message);
-      return;
-    });
+    try{
+      const userId = req.user.id;
 
-    res.status(200).json(groups);
+      const groups = await groupService.getListOwnedGroup(userId);
+
+      res.status(200).json({
+        success: true,
+        message: "Get successfully",
+        data: {groups}
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: true,
+        message: "Server error",
+      })
+    }
   };
 
   // [GET] users/:id/groups/joined
@@ -126,7 +133,7 @@ class UserController {
   verifyStatus = async (req, res) => {
     try {
       const user = req.user;
-      if (user !== undefined) {
+      if (user !== undefined && user.email !== undefined) {
         const status = await userService.getVerifyStatus(user.id);
         res.status(200).json(status);
       } else {

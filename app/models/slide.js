@@ -15,23 +15,23 @@ module.exports = (sequelize, DataTypes) => {
         constraints: false,
       });
 
-      this.hasOne(models.SlideType, {
+      this.belongsTo(models.SlideType, {
         foreignKey: "typeId",
         as: "SlideType",
         constraints: false,
       });
 
-      this.hasOne(models.MultipleChoice, {
+      this.belongsTo(models.MultipleChoice, {
         foreignKey: "contentId",
         as: "MultipleChoice",
         constraints: false,
       });
-      this.hasOne(models.Heading, {
+      this.belongsTo(models.Heading, {
         foreignKey: "contentId",
         as: "Heading",
         constraints: false,
       });
-      this.hasOne(models.Paragraph, {
+      this.belongsTo(models.Paragraph, {
         foreignKey: "contentId",
         as: "Paragraph",
         constraints: false,
