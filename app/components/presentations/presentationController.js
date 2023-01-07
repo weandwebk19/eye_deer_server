@@ -15,7 +15,7 @@ class PresentationController {
 
       // add presentation to group if exist groupId
       const groupId = req.body.groupId;
-      if(groupId){
+      if (groupId) {
         groupService.addPresentationToGroup(groupId, newPresentation.id);
       }
 
@@ -135,9 +135,12 @@ class PresentationController {
 
   removePresentationInGroup = async (req, res) => {
     try {
-      const {groupId, presentationId} = req.body;
+      const { groupId, presentationId } = req.body;
 
-      await presentationService.removePresentationInGroup(groupId, presentationId);
+      await presentationService.removePresentationInGroup(
+        groupId,
+        presentationId
+      );
 
       return res.status(200).json({
         success: true,
@@ -185,9 +188,10 @@ class PresentationController {
       });
     }
   };
+
   removePresentation = async (req, res) => {
     try {
-      const {presentationId} = req.body;
+      const { presentationId } = req.body;
       const userId = req.user.id;
 
       await presentationService.removePresentation(presentationId, userId);
@@ -206,68 +210,104 @@ class PresentationController {
   };
 
   getMyPresentations = async (req, res) => {
-    try{
+    try {
       const userId = req.user.id;
 
-      const presentations = await presentationService.getPresentationsOfUser(userId);
-      
+      const presentations = await presentationService.getPresentationsOfUser(
+        userId
+      );
+
       res.status(200).json({
         success: true,
         message: "Get successfully",
-        data: {presentations}
-      })
-    }
-    catch(error){
+        data: { presentations },
+      });
+    } catch (error) {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Server error"
+        message: "Server error",
       });
     }
-  }
+  };
 
   getMyCoPresentations = async (req, res) => {
-    try{
+    try {
       const userId = req.user.id;
 
-      const coPresentations = await presentationService.getCoPresentationsOfUser(userId);
-      
+      const coPresentations =
+        await presentationService.getCoPresentationsOfUser(userId);
+
       res.status(200).json({
         success: true,
         message: "Get successfully",
-        data: {coPresentations}
-      })
-    }
-    catch(error){
+        data: { coPresentations },
+      });
+    } catch (error) {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Server error"
+        message: "Server error",
       });
     }
-  }
+  };
 
   findPresentationsByName = async (req, res) => {
-    try{
+    try {
       const userId = req.user.id;
       const namePresentation = req.body.namePresentation;
 
-      const presentations = await presentationService.findPresentationsByName(userId, namePresentation);
-      
+      const presentations = await presentationService.findPresentationsByName(
+        userId,
+        namePresentation
+      );
+
       res.status(200).json({
         success: true,
         message: "Get successfully",
-        data: {presentations}
-      })
-    }
-    catch(error){
+        data: { presentations },
+      });
+    } catch (error) {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Server error"
+        message: "Server error",
       });
     }
-  }
+  };
+
+  //[GET] /presentaions/:id/chat/questions
+  getChatQuestions = async function (req, res) {
+    try {
+      const presentationId = req.params.id;
+      const questions = await presentationService.getListChatQuestion(
+        presentationId
+      );
+
+      const questionsResponse = await Promise.all(
+        questions.map(async (question) => {
+          // const userInfo = await userService.getUserById(question.userId);
+          return {
+            ...question,
+            userId: question.userId,
+            questions: [question.content],
+            upvote: [question.upvote],
+          };
+        })
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Get chat question list successfully.",
+        data: questionsResponse,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
 }
 
 module.exports = new PresentationController();

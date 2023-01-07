@@ -2,7 +2,7 @@ const db = require("../../models");
 const models = db.sequelize.models;
 const Op = db.Sequelize.Op;
 const sequelize = db.sequelize;
-const { QueryTypes } = require('sequelize');
+const { QueryTypes } = require("sequelize");
 const generatePresentationCode = require("../../utils/generatePresentationCode");
 
 class PresentationService {
@@ -88,13 +88,13 @@ class PresentationService {
 
     return findResource;
   };
-  
+
   removePresentation = async (presentationId, userId) => {
-    //soft remove presentation 
+    //soft remove presentation
     await models.Presentation.destroy({
       where: {
         id: presentationId,
-        userCreated: userId
+        userCreated: userId,
       },
     });
   };
@@ -105,10 +105,12 @@ class PresentationService {
                 where presentations.userCreated = '${userId}' and presentations.deletedAt is null
                 group by presentations.id`;
 
-    const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const presentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
     return presentations;
-  }
+  };
 
   getCoPresentationsOfUser = async (userId) => {
     const sql = `select presentations.*, count(distinct(slides.id)) as slides
@@ -119,10 +121,12 @@ class PresentationService {
                 and presentations.deletedAt is null
                 group by presentations.id`;
 
-    const coPresentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const coPresentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
     return coPresentations;
-  }
+  };
 
   findPresentationsByName = async (userId, namePresentation) => {
     const sql = `select presentations.*, count(slides.id) as slides
@@ -131,10 +135,41 @@ class PresentationService {
                 and presentations.deletedAt is null
                 group by presentations.id`;
 
-    const presentations = await sequelize.query(sql, { type: QueryTypes.SELECT });
+    const presentations = await sequelize.query(sql, {
+      type: QueryTypes.SELECT,
+    });
 
     return presentations;
-  }
+  };
+
+  createChatQuestion = async (question) => {
+    const newResource = await models.ChatQuestion.create(question);
+
+    return newResource;
+  };
+
+  getListChatQuestion = async (presentationId) => {
+    const questions = await models.ChatQuestion.findAll({
+      where: { presentationId },
+      raw: true,
+    });
+
+    return questions;
+  };
+
+  updateMarkAsAnswered = async (questionId) => {
+    await models.ChatQuestion.update(
+      { isAnswered: true },
+      { where: { id: questionId } }
+    );
+  };
+
+  updateRestoreQuestion = async (questionId) => {
+    await models.ChatQuestion.update(
+      { isAnswered: false },
+      { where: { id: questionId } }
+    );
+  };
 }
 
 module.exports = new PresentationService();

@@ -112,9 +112,69 @@ module.exports = (io, socket) => {
     }
   };
 
+  const handleCreateChatQuestion = async (data) => {
+    try {
+      const { code, presentationId, ...questionInfo } = data;
+      // const newChatQuestion = await presentationService.createChatQuestion(
+      //   chatQuestion
+      // );
+
+      io.sockets.in(code).emit("SERVER_SEND_CHAT_QUESTION", questionInfo);
+      io.sockets.emit("SERVER_SEND_CHAT_QUESTION", questionInfo);
+
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${presentationId}_chatQuestions`
+      );
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        const newChatQuestions = chatQuestions.concat(questionInfo);
+        rediscl.set(
+          `presentation${presentationId}_chatQuestions`,
+          JSON.stringify(newChatQuestions)
+        );
+        console.log(newChatQuestions);
+      } else {
+        rediscl.set(
+          `presentation${presentationId}_chatQuestions`,
+          JSON.stringify([questionInfo])
+        );
+        console.log(questionInfo);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleResponseChatQuestion = async (data) => {
+    const { code, presentationId } = data;
+    const chatQuestionsJson = await rediscl.get(
+      `presentation${presentationId}_chatQuestions`
+    );
+    if (chatQuestionsJson) {
+      const chatQuestions = JSON.parse(chatQuestionsJson);
+      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+    }
+  };
+
+  const markAsAnsweredQuestion = async (data) => {
+    console.log("marked", data);
+    await presentationService.updateMarkAsAnswered(data.questionId);
+    io.sockets.emit("PARTICIPANT_QUESTION_ANSWERED", data);
+  };
+
+  const restoreQuestion = async (data) => {
+    console.log("marked", data);
+    await presentationService.updateRestoreQuestion(data.questionId);
+    io.sockets.emit("PARTICIPANT_QUESTION_RESTORED", data);
+  };
+
   socket.on("CLIENT_SEND_JOIN_PRESENTATION", userJoinPresent);
   socket.on("HOST_START_PRESENT", startPresent);
   socket.on("HOST_END_PRESENT", endPresent);
   socket.on("HOST_MOVE_TO_SLIDE", moveToSlide);
   socket.on("PARTICIPANT_SEND_INCREASE_VOTE", increaseVote);
+  socket.on("PARTICIPANT_SEND_QUESTION", handleCreateChatQuestion);
+  socket.on("HOST_MARK_AS_ANSWERED", markAsAnsweredQuestion);
+  socket.on("HOST_RESTORE_QUESTION", restoreQuestion);
+  socket.on("CLIENT_GET_LIST_QUESTIONS", handleResponseChatQuestion);
 };
