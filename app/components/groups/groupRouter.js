@@ -74,4 +74,9 @@ router.post("/:id/add-presentation", function (req, res, next) {
   groupController.addPresentationToGroup(req, res);
 });
 
+// Delete group by id
+router.post("/:id/remove", groupMiddleware.isOwner, function (req, res, next) {
+  groupController.removeGroup(req, res);
+});
+
 module.exports = router;

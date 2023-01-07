@@ -89,6 +89,21 @@ class PresentationService {
     return findResource;
   };
 
+  createChatMessage = async (message) => {
+    const newResource = await models.ChatMessage.create(message);
+
+    return newResource;
+  };
+
+  getListChatMessage = async (presentationId) => {
+    const messages = await models.ChatMessage.findAll({
+      where: { presentationId },
+      raw: true,
+    });
+
+    return messages;
+  };
+
   removePresentation = async (presentationId, userId) => {
     //soft remove presentation
     await models.Presentation.destroy({
@@ -168,6 +183,16 @@ class PresentationService {
     await models.ChatQuestion.update(
       { isAnswered: false },
       { where: { id: questionId } }
+    );
+  };
+  updatePresentation = async (presentationId, presentationName, status) => {
+    await models.Presentation.update(
+      { name: presentationName, status },
+      {
+        where: {
+          id: presentationId,
+        },
+      }
     );
   };
 }
