@@ -302,6 +302,15 @@ class SlideService {
 
     return newContent;
   };
+
+  deleteSlide = async (slideId) => {
+    await models.Slide.destroy({
+      force: true,
+      where: {
+        id: slideId,
+      },
+    });
+  };
 }
 
 module.exports = new SlideService();

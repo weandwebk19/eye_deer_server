@@ -12,8 +12,6 @@ class SlideController {
       const typeId = req.body.typeId;
       const content = req.body.content;
       let newContent;
-      console.log("--------------------------------------");
-      console.log(typeId);
 
       switch (typeId) {
         case 1:
@@ -41,7 +39,6 @@ class SlideController {
         note: "",
         contentId: newContent.id,
       });
-      console.log(newSlide);
 
       return res.status(201).json({
         success: true,
@@ -295,6 +292,24 @@ class SlideController {
           message: "Slide not found.",
         });
       }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
+
+  // [DELETE] /:id/delete
+  deleteSlide = async function (req, res) {
+    try {
+      const slideId = req.params.id;
+
+      await slideService.deleteSlide(slideId);
+      return res.status(201).json({
+        success: true,
+        message: `Delete slide ${slideId} successfully.`,
+      });
     } catch (err) {
       return res.status(500).json({
         success: false,

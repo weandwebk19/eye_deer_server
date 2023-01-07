@@ -153,6 +153,37 @@ module.exports = (io, socket) => {
     }
   };
 
+  const handleCreateChatQuestion = async (data) => {
+    try {
+      const { code, presentationId, ...questionInfo } = data;
+      // const newChatQuestion = await presentationService.createChatQuestion(
+      //   chatQuestion
+      // );
+
+      io.sockets.in(code).emit("SERVER_SEND_CHAT_QUESTION", data);
+
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${presentationId}_chatQuestions`
+      );
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        const newChatQuestions = chatQuestions.concat(data);
+        rediscl.set(
+          `presentation${presentationId}_chatQuestions`,
+          JSON.stringify(newChatQuestions)
+        );
+        console.log(newChatQuestions);
+      } else {
+        rediscl.set(
+          `presentation${presentationId}_chatQuestions`,
+          JSON.stringify([data])
+        );
+        console.log(data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const handleCreateChatMessage = async (data) => {
     try {
       const { code, presentationId, ...chatInfo } = data;
@@ -180,6 +211,117 @@ module.exports = (io, socket) => {
     }
   };
 
+  const handleResponseChatQuestion = async (data) => {
+    const { code, presentationId } = data;
+    const chatQuestionsJson = await rediscl.get(
+      `presentation${presentationId}_chatQuestions`
+    );
+    if (chatQuestionsJson) {
+      const chatQuestions = JSON.parse(chatQuestionsJson);
+      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+    }
+  };
+
+  const markAsAnsweredQuestion = async (data) => {
+    // await presentationService.updateMarkAsAnswered(data.questionId);
+    // io.sockets.emit("PARTICIPANT_QUESTION_ANSWERED", data);
+
+    const chatQuestionsJson = await rediscl.get(
+      `presentation${data.presentationId}_chatQuestions`
+    );
+    if (chatQuestionsJson) {
+      const chatQuestions = JSON.parse(chatQuestionsJson);
+      chatQuestions.find(
+        (question) => question.id === data.questionId
+      ).isAnswered = true;
+      rediscl.set(
+        `presentation${data.presentationId}_chatQuestions`,
+        JSON.stringify(chatQuestions)
+      );
+      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+      socket.in(data.code).emit("PARTICIPANT_QUESTION_ANSWERED", chatQuestions);
+    }
+  };
+
+  const restoreQuestion = async (data) => {
+    // await presentationService.updateRestoreQuestion(data.questionId);
+    // io.sockets.emit("PARTICIPANT_QUESTION_RESTORED", data);
+
+    const chatQuestionsJson = await rediscl.get(
+      `presentation${data.presentationId}_chatQuestions`
+    );
+    if (chatQuestionsJson) {
+      const chatQuestions = JSON.parse(chatQuestionsJson);
+      chatQuestions.find(
+        (question) => question.id === data.questionId
+      ).isAnswered = false;
+      rediscl.set(
+        `presentation${data.presentationId}_chatQuestions`,
+        JSON.stringify(chatQuestions)
+      );
+      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+      socket.in(data.code).emit("PARTICIPANT_QUESTION_RESTORED", chatQuestions);
+    }
+  };
+
+  const handleResponseQuestionUpvote = async (data) => {
+    const { questionId, presentationId } = data;
+    const chatQuestionsJson = await rediscl.get(
+      `presentation${presentationId}_chatQuestions`
+    );
+    if (chatQuestionsJson) {
+      const chatQuestions = JSON.parse(chatQuestionsJson);
+      const questionUpvotes = await chatQuestions.find(
+        (question) => question.id === questionId
+      );
+      socket.emit("SERVER_SEND_LIST_UPVOTES", questionUpvotes);
+    }
+  };
+
+  const upvoteQuestion = async (data) => {
+    try {
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${data.presentationId}_chatQuestions`
+      );
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        chatQuestions
+          .find((question) => question.id === data.questionId)
+          .upvote.push(data.userId);
+        rediscl.set(
+          `presentation${data.presentationId}_chatQuestions`,
+          JSON.stringify(chatQuestions)
+        );
+        socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+        socket.in(data.code).emit("SERVER_SEND_UPVOTE_QUESTION", chatQuestions);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const unupvoteQuestion = async (data) => {
+    try {
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${data.presentationId}_chatQuestions`
+      );
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        const userUnupvote = chatQuestions.indexOf(data.userId);
+        chatQuestions
+          .find((question) => question.id === data.questionId)
+          .upvote.splice(userUnupvote, 1);
+        rediscl.set(
+          `presentation${data.presentationId}_chatQuestions`,
+          JSON.stringify(chatQuestions)
+        );
+        socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+        socket.in(data.code).emit("SERVER_SEND_UPVOTE_QUESTION", chatQuestions);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const handleResponseChatMessage = async (data) => {
     const { code, presentationId } = data;
     const chatMessagesJson = await rediscl.get(
@@ -219,6 +361,13 @@ module.exports = (io, socket) => {
   socket.on("HOST_END_PRESENT", endPresent);
   socket.on("HOST_MOVE_TO_SLIDE", moveToSlide);
   socket.on("PARTICIPANT_SEND_INCREASE_VOTE", increaseVote);
+  socket.on("PARTICIPANT_SEND_QUESTION", handleCreateChatQuestion);
+  socket.on("HOST_MARK_AS_ANSWERED", markAsAnsweredQuestion);
+  socket.on("HOST_RESTORE_QUESTION", restoreQuestion);
+  socket.on("CLIENT_GET_LIST_QUESTIONS", handleResponseChatQuestion);
+  socket.on("CLIENT_GET_LIST_UPVOTE", handleResponseQuestionUpvote);
+  socket.on("PARTICIPANT_SEND_UPVOTE", upvoteQuestion);
+  socket.on("PARTICIPANT_SEND_UNUPVOTE", unupvoteQuestion);
   socket.on("PARTICIPANT_SEND_MESSAGE", handleCreateChatMessage);
   socket.on("CLIENT_GET_LIST_MESSAGES", handleResponseChatMessage);
   socket.on("CLIENT_GET_LIST_PARTICIPANTS", handleResponseParticipantsList);

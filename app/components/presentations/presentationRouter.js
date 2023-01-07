@@ -60,8 +60,12 @@ router.post("/find-by-name", function (req, res, next) {
   PresentationController.findPresentationsByName(req, res);
 });
 
+// Get chat question list of a presentation
+router.get("/:id/chat/questions", function (req, res, next) {
+  PresentationController.getChatQuestions(req, res);
+});
 // find one presentation by id
-router.post("/find-by-id" , function (req, res, next) {
+router.post("/find-by-id", function (req, res, next) {
   PresentationController.findPresentationById(req, res);
 });
 
