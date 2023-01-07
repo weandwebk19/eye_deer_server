@@ -24,6 +24,7 @@ var server = http.createServer(app);
 
 //Socket.io setup
 var onConnection = require("../app/socketIo");
+const rediscl = require("../app/redis");
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -50,7 +51,6 @@ io.on("connection", (socket) => {
   console.log("Client connected:" + socket.id);
   socket.on("disconnect", () => {
     console.log("Client disconnected:" + socket.id);
-    // end of disconnect
   });
 
   onConnection(io, socket);

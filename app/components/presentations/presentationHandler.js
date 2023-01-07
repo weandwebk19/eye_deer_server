@@ -96,8 +96,15 @@ module.exports = (io, socket) => {
         },
       ])
     );
-    console.log("rediscl", await rediscl.get(code));
+    // console.log("rediscl", await rediscl.get(code));
     // console.log(socket.adapter.rooms);
+
+    // notify to all members in group
+    const members = await groupService.getListMembers(groupId);
+    members.forEach(async (member) => {
+      const socketId = await rediscl.get(`socketid_${member.id}`);
+      io.sockets.to(socketId).emit("SERVER_SEND_HOST_START_PRESENT", data);
+    });
   };
 
   const endPresent = async (data) => {
@@ -149,18 +156,6 @@ module.exports = (io, socket) => {
   const handleCreateChatMessage = async (data) => {
     try {
       const { code, presentationId, ...chatInfo } = data;
-      // const newChatMessage = await presentationService.createChatMessage(
-      //   chatMessage
-      // );
-      // const userInfo = await userService.getUserById(chatMessage.userId);
-      // io.sockets.in(code).emit("SERVER_SEND_CHAT_MESSAGE", {
-      //   ...newChatMessage.dataValues,
-      //   avatar: userInfo.picture,
-      //   name: `${userInfo.firstName ?? ""} ${userInfo?.lastName ?? ""}`,
-      //   messages: [newChatMessage.content],
-      // });
-
-      // console.log("data", code, presentationId, chatInfo);
 
       io.sockets.in(code).emit("SERVER_SEND_CHAT_MESSAGE", chatInfo);
 
@@ -207,6 +202,18 @@ module.exports = (io, socket) => {
     }
   };
 
+  const handleSetUserToRedis = async (user) => {
+    if (user) {
+      rediscl.set(`socketid_${user.id}`, socket.id);
+    }
+  };
+
+  const handleRemoveUserFromRedis = async (user) => {
+    if (user) {
+      rediscl.del(`socketid_${user.id}`);
+    }
+  };
+
   socket.on("CLIENT_SEND_JOIN_PRESENTATION", userJoinPresent);
   socket.on("HOST_START_PRESENT", startPresent);
   socket.on("HOST_END_PRESENT", endPresent);
@@ -215,4 +222,6 @@ module.exports = (io, socket) => {
   socket.on("PARTICIPANT_SEND_MESSAGE", handleCreateChatMessage);
   socket.on("CLIENT_GET_LIST_MESSAGES", handleResponseChatMessage);
   socket.on("CLIENT_GET_LIST_PARTICIPANTS", handleResponseParticipantsList);
+  socket.on("CLIENT_CONECTED", handleSetUserToRedis);
+  socket.on("CLIENT_DISCONECTED", handleRemoveUserFromRedis);
 };
