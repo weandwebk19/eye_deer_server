@@ -145,7 +145,7 @@ class PresentationService {
 
   findPresentationsByName = async (userId, namePresentation) => {
     const sql = `select presentations.*, count(slides.id) as slides
-                from presentations join slides on presentations.id = slides.presentationId
+                from presentations left join slides on presentations.id = slides.presentationId
                 where presentations.userCreated = '${userId}' and presentations.name like '%${namePresentation}%'
                 and presentations.deletedAt is null
                 group by presentations.id`;
