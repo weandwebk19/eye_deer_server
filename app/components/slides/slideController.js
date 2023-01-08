@@ -317,6 +317,42 @@ class SlideController {
       });
     }
   };
+
+  // [PUT] /slides/:id/vote/reset
+  resetVote = async function (req, res) {
+    try {
+      const { slideId } = req.body;
+
+      const slide = await slideService.getSlideById(slideId);
+      if (slide) {
+        if (slide.typeId !== 1) {
+          return res.status(406).json({
+            success: false,
+            message: "This slide type is not supported.",
+          });
+        }
+
+        const option = await slideService.resetVote(slide.contentId);
+        await slideService.removeUserVoted(slideId);
+
+        return res.status(200).json({
+          success: true,
+          message: "Update vote successfully.",
+          data: option,
+        });
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: "Slide  is not found.",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
 }
 
 module.exports = new SlideController();

@@ -169,7 +169,6 @@ class PresentationController {
         slideId,
         userId,
       });
-      console.log("userVoted", userVoted);
       if (userVoted > 0) {
         return res.status(200).json({
           success: true,

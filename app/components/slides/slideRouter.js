@@ -45,4 +45,9 @@ router.delete("/:id/delete", function (req, res, next) {
   SlideController.deleteSlide(req, res);
 });
 
+// reset vote
+router.put("/:id/vote/reset", function (req, res, next) {
+  SlideController.resetVote(req, res);
+});
+
 module.exports = router;

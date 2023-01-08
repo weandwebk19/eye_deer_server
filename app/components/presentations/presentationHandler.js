@@ -239,7 +239,9 @@ module.exports = (io, socket) => {
         JSON.stringify(chatQuestions)
       );
       socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
-      socket.in(data.code).emit("PARTICIPANT_QUESTION_ANSWERED", chatQuestions);
+      io.sockets
+        .in(data.code)
+        .emit("PARTICIPANT_QUESTION_ANSWERED", chatQuestions);
     }
   };
 
@@ -260,7 +262,9 @@ module.exports = (io, socket) => {
         JSON.stringify(chatQuestions)
       );
       socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
-      socket.in(data.code).emit("PARTICIPANT_QUESTION_RESTORED", chatQuestions);
+      io.sockets
+        .in(data.code)
+        .emit("PARTICIPANT_QUESTION_RESTORED", chatQuestions);
     }
   };
 
@@ -292,8 +296,12 @@ module.exports = (io, socket) => {
           `presentation${data.presentationId}_chatQuestions`,
           JSON.stringify(chatQuestions)
         );
+
+        console.log("Upvote", data.code);
         socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
-        socket.in(data.code).emit("SERVER_SEND_UPVOTE_QUESTION", chatQuestions);
+        io.sockets
+          .in(data.code)
+          .emit("SERVER_SEND_UPVOTE_QUESTION", chatQuestions);
       }
     } catch (err) {
       console.log(err);
@@ -316,7 +324,9 @@ module.exports = (io, socket) => {
           JSON.stringify(chatQuestions)
         );
         socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
-        socket.in(data.code).emit("SERVER_SEND_UPVOTE_QUESTION", chatQuestions);
+        io.sockets
+          .in(data.code)
+          .emit("SERVER_SEND_UPVOTE_QUESTION", chatQuestions);
       }
     } catch (err) {
       console.log(err);
