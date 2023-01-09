@@ -111,7 +111,7 @@ module.exports = (io, socket) => {
     console.log("end present", data);
     rediscl.del(data.code);
     rediscl.del(`presentation${data.presentationId}_participants`);
-    rediscl.del(`presentation${data.presentationId}_chatMessages`);
+    // rediscl.del(`presentation${data.presentationId}_chatMessages`);
     io.sockets.in(data.code).emit("PARTICIPANT_END_PRESENT");
     // console.log("rediscl", await rediscl.get(data));
     // console.log(socket.adapter.rooms);
