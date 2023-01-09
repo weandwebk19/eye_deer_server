@@ -169,7 +169,6 @@ class PresentationController {
         slideId,
         userId,
       });
-      console.log("userVoted", userVoted);
       if (userVoted > 0) {
         return res.status(200).json({
           success: true,
@@ -360,6 +359,39 @@ class PresentationController {
       res.status(500).json({
         success: false,
         message: "Server error",
+      });
+    }
+  };
+
+  //[GET] /presentaions/:id/chat/questions
+  getChatQuestions = async function (req, res) {
+    try {
+      const presentationId = req.params.id;
+      const questions = await presentationService.getListChatQuestion(
+        presentationId
+      );
+
+      const questionsResponse = await Promise.all(
+        questions.map(async (question) => {
+          // const userInfo = await userService.getUserById(question.userId);
+          return {
+            ...question,
+            userId: question.userId,
+            questions: [question.content],
+            upvote: [question.upvote],
+          };
+        })
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Get chat question list successfully.",
+        data: questionsResponse,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
       });
     }
   };

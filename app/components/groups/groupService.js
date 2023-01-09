@@ -24,18 +24,19 @@ class GroupService {
   };
 
   getListOwnedGroup = async (userId) => {
-    const sqlGetDBName = 'select database() as DBName;';
-    const DBName = (await sequelize.query(sqlGetDBName, { type: QueryTypes.SELECT}))[0].DBName;
-    
-    const sql = 
-      `select ${DBName}.groups.*, count(group_users.userId) as totalMembers
+    const sqlGetDBName = "select database() as DBName;";
+    const DBName = (
+      await sequelize.query(sqlGetDBName, { type: QueryTypes.SELECT })
+    )[0].DBName;
+
+    const sql = `select ${DBName}.groups.*, count(group_users.userId) as totalMembers
       from (select * from group_users where group_users.userId = '${userId}' and group_users.roleId = 1) as gr
       join ${DBName}.groups on gr.groupId = ${DBName}.groups.id
       join group_users on gr.groupId = group_users.groupId
       where ${DBName}.groups.deletedAt is null
       group by gr.groupId`;
 
-    const groups = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    const groups = await sequelize.query(sql, { type: QueryTypes.SELECT });
 
     return groups;
   };
@@ -263,19 +264,19 @@ class GroupService {
         raw: true,
         where: {
           groupId,
-          presentationId
+          presentationId,
         },
-      })
-      if(presentation){
+      });
+      if (presentation) {
         return false;
       }
-      
+
       await models.Group_Presentation.create({
         groupId,
-        presentationId
-      })
+        presentationId,
+      });
 
-      return true;      
+      return true;
     } catch (err) {
       console.log(err);
       return err;
@@ -284,7 +285,7 @@ class GroupService {
 
   removeGroup = async (groupId) => {
     await models.Group.destroy({
-      where: { id: groupId},
+      where: { id: groupId },
     });
   };
 }

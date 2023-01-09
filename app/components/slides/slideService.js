@@ -302,6 +302,37 @@ class SlideService {
 
     return newContent;
   };
+
+  deleteSlide = async (slideId) => {
+    await models.Slide.destroy({
+      force: true,
+      where: {
+        id: slideId,
+      },
+    });
+  };
+
+  resetVote = async (contentId) => {
+    const newOption = await models.Option.update(
+      { vote: 0 },
+      {
+        where: {
+          contentId: contentId,
+        },
+      }
+    );
+    return newOption;
+  };
+
+  removeUserVoted = async (slideId) => {
+    const newVoted = await models.UserVoted.destroy({
+      force: true,
+      where: {
+        slideId: slideId,
+      },
+    });
+    return newVoted;
+  };
 }
 
 module.exports = new SlideService();

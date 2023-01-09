@@ -199,7 +199,7 @@ class GroupController {
       //send email to member
       const subject = "[Eye Deer] - Join Group";
       const content = `${userInfo.lastName} ${userInfo.firstName}(${userInfo.email}) has invited you join to their group.<br>Click below button to join this group!`;
-      const link = `${process.env.FRONTEND_BASE_URL}/groups/invite/${token}`;
+      const link = `${process.env.FRONTEND_BASE_URL}/group/invite/${token}`;
       await sendEmail(member.email, subject, content, link);
 
       //return
@@ -413,7 +413,7 @@ class GroupController {
   };
 
   getRoleInGroup = async (req, res) => {
-    try{
+    try {
       const userId = req.user.id;
       const groupId = req.params.id;
 
@@ -421,64 +421,64 @@ class GroupController {
       res.status(200).json({
         success: true,
         message: "Get role successfully",
-        data: {roleType},
-      })
-    }
-    catch(error){
+        data: { roleType },
+      });
+    } catch (error) {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Server error"
-      })
+        message: "Server error",
+      });
     }
-  }
+  };
 
   addPresentationToGroup = async (req, res) => {
-    try{
-      const {groupId, presentationId} = req.body;
-      const status = await groupService.addPresentationToGroup(groupId, presentationId);
+    try {
+      const { groupId, presentationId } = req.body;
+      const status = await groupService.addPresentationToGroup(
+        groupId,
+        presentationId
+      );
 
-      if(!status){
+      if (!status) {
         res.status(400).json({
           success: false,
-          message: "Presentation is already in group"
-        })
+          message: "Presentation is already in group",
+        });
 
         return;
       }
-      
+
       res.status(200).json({
         success: true,
         message: "Add presentation successfully",
-      })
-    }
-    catch(error){
+      });
+    } catch (error) {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Server error"
-      })
+        message: "Server error",
+      });
     }
-  }
+  };
 
   removeGroup = async (req, res) => {
-    try{
-      const {groupId} = req.body;
+    try {
+      const { groupId } = req.body;
       await groupService.removeGroup(groupId);
-      
+
       res.status(200).json({
         success: true,
         message: "Remove successfully",
-      })
-    }
-    catch(error){
+      });
+    } catch (error) {
       console.log(error);
       res.status(500).json({
         success: false,
-        message: "Server error"
-      })
+        message: "Server error",
+      });
     }
-  }
+  };
 }
 
 module.exports = new GroupController();

@@ -157,6 +157,34 @@ class PresentationService {
     return presentations;
   };
 
+  createChatQuestion = async (question) => {
+    const newResource = await models.ChatQuestion.create(question);
+
+    return newResource;
+  };
+
+  getListChatQuestion = async (presentationId) => {
+    const questions = await models.ChatQuestion.findAll({
+      where: { presentationId },
+      raw: true,
+    });
+
+    return questions;
+  };
+
+  updateMarkAsAnswered = async (questionId) => {
+    await models.ChatQuestion.update(
+      { isAnswered: true },
+      { where: { id: questionId } }
+    );
+  };
+
+  updateRestoreQuestion = async (questionId) => {
+    await models.ChatQuestion.update(
+      { isAnswered: false },
+      { where: { id: questionId } }
+    );
+  };
   updatePresentation = async (presentationId, presentationName, status) => {
     await models.Presentation.update(
       { name: presentationName, status },
