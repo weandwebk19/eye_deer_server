@@ -1,6 +1,9 @@
 const authService = require("./authService");
 const userService = require("../users/userService");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+const sendEmail = require("../../utils/sendVerifyEmail");
 const rediscl = require("../../redis");
 
 class AuthController {
@@ -293,6 +296,87 @@ class AuthController {
       return res.status(500).json({ message: err.message });
     }
   };
+
+  // generate reset password link
+  generateResetPasswordLink = async (req, res) => {
+    try{
+      const {email} = req.body;
+
+      // check exist email before generate link
+      const userInfo = await userService.getUserByEmail(email);
+      
+      if(!userInfo){
+        res.status(400).json({
+          success: false,
+          message: "Email has never been registered",
+        });
+
+        return;
+      }
+
+      // generate token, expire: 5m
+      const token = jwt.sign({userId: userInfo.id}, process.env.JWT_ACCESS_KEY, {expiresIn: 5*60});
+
+      // send link to email
+      const subject = "[Eye Deer] - Reset Password";
+      const content = `Hello ${userInfo.lastName} ${userInfo.firstName}(${userInfo.email})!
+                      <br>This email need is secured, do not share to anyone. Exprire of this session is 5 miniutes.
+                      <br>Click below button to reset password.`;
+      const link = `${process.env.FRONTEND_BASE_URL}/reset-password/${token}`;
+      await sendEmail(email, subject, content, link);
+
+      res.status(200).json({
+        success: true,
+        message: "Reset password link has sent. Go to your email to reset password",
+      })
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      })
+    }
+  }
+
+  resetPassword = async (req, res) => {
+    try{
+      const {token, password} = req.body;
+
+      //handle jwt
+      const {err, decoded} = jwt.verify(token, process.env.JWT_ACCESS_KEY, async function(err, decoded){
+        if(err){
+          console.log(err);
+          res.status(400).json({
+            success: false,
+            message: err.message,
+          })
+          return;
+        }
+
+        // get user id
+        const userId = decoded.userId;
+
+        //reset password
+        const hashPassword = await bcrypt.hash(password, saltRounds);
+        await userService.resetPassword(userId, hashPassword);
+        
+        res.status(200).json({
+          success: true,
+          message: "Reset password successfully",
+        })
+
+        return;
+      });
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      })
+    }
+  }
 }
 
 module.exports = new AuthController();
