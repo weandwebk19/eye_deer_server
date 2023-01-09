@@ -14,6 +14,16 @@ router.post("/register", function (req, res, next) {
   authController.register(req, res);
 });
 
+// [POST] /reset-password/generate-link to generate reset password link
+router.post("/reset-password/generate-link", function (req, res, next) {
+  authController.generateResetPasswordLink(req, res);
+});
+
+// [POST] /reset-password/reset to set new password
+router.post("/reset-password/reset", function (req, res, next) {
+  authController.resetPassword(req, res);
+});
+
 //[POST] /login
 router.post(
   "/login",

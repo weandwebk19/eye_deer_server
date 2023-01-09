@@ -137,6 +137,14 @@ class UserService {
       return error;
     }
   };
+  
+  resetPassword = async (userId, hashPassword) => {
+    await models.User.update({ password: hashPassword }, {
+      where: {
+        id: userId,
+      }
+    });
+  };
 }
 
 module.exports = new UserService();
