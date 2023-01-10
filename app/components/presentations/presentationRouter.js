@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const PresentationController = require("./PresentationController");
+const PresentationController = require("./presentationController");
 const groupMiddleware = require("../groups/groupMiddleware");
 
 // Create new presentation
