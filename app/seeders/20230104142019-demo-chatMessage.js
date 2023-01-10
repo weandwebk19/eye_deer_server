@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert("ChatQuestions", [
+    return queryInterface.bulkInsert("chatquestions", [
       {
         presentationId: 1,
         userId: "8088aa7e-c24d-4b74-9a68-012196c87417",
@@ -72,6 +72,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("ChatQuestions", null, {});
+    return queryInterface.bulkDelete("chatquestions", null, {});
   },
 };

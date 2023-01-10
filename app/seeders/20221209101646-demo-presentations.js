@@ -4,7 +4,7 @@ const generateCode = require("../utils/generatePresentationCode");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert("Presentations", [
+    return queryInterface.bulkInsert("presentations", [
       {
         id: 1,
         name: "My First Presentation",
@@ -26,6 +26,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("Presentations", null, {});
+    return queryInterface.bulkDelete("presentations", null, {});
   },
 };

@@ -9,12 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association
-      this.belongsTo(models.Group, {
+      this.belongsTo(models.group, {
         foreignKey: "groupId",
         as: "Group",
         constraints: false,
       });
-      this.belongsTo(models.User, {
+      this.belongsTo(models.user, {
         foreignKey: "userId",
         as: "User",
         constraints: false,
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Group_User",
+      modelName: "group_user",
     }
   );
   return Group_User;

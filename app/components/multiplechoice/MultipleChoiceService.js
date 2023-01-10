@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 
 class MultipleChoiceService {
   createMultipleChoice = async (content) => {
-    const newMultipleChoice = await models.MultipleChoice.create({
+    const newMultipleChoice = await models.multiplechoice.create({
       question: content.question,
     });
 

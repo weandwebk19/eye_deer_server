@@ -9,15 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association
-      this.belongsToMany(models.User, {
-        through: "Group_User",
+      this.belongsToMany(models.user, {
+        through: "group_user",
         foreignKey: "groupId",
         otherKey: "userId",
         as: "Group",
         constraints: false,
       });
-      this.belongsToMany(models.Presentation, {
-        through: "Group_Presentation",
+      this.belongsToMany(models.presentation, {
+        through: "group_presentation",
         foreignKey: "groupId",
         otherKey: "presentationId",
         as: "GroupPresentation",
@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       paranoid: true,
-      modelName: "Group",
+      modelName: "group",
     }
   );
   return Group;

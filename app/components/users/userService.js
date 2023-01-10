@@ -7,14 +7,14 @@ const sequelize = db.sequelize;
 
 class UserService {
   getAllUsers = async () => {
-    const users = await models.User.findAll({
+    const users = await models.user.findAll({
       raw: true,
     });
     return users;
   };
 
   getUsers = async (query) => {
-    const users = await models.User.findAll({
+    const users = await models.user.findAll({
       where: {
         [Op.or]: [
           { id: query.id ? query.id : null },
@@ -30,7 +30,7 @@ class UserService {
   };
 
   getSearchUsers = async (term) => {
-    const users = await models.User.findAll({
+    const users = await models.user.findAll({
       where: {
         [Op.or]: [
           { username: { [Op.like]: `${term}%` } },
@@ -44,7 +44,7 @@ class UserService {
   };
 
   getUserByUsername = async (username) => {
-    const user = await models.User.findOne({
+    const user = await models.user.findOne({
       where: {
         username: username,
       },
@@ -54,7 +54,7 @@ class UserService {
   };
 
   getUserByEmail = async (email) => {
-    const user = await models.User.findOne({
+    const user = await models.user.findOne({
       where: {
         email: email,
       },
@@ -64,7 +64,7 @@ class UserService {
   };
 
   getUserById = async (id) => {
-    const user = await models.User.findOne({
+    const user = await models.user.findOne({
       where: {
         id: id,
       },
@@ -75,7 +75,7 @@ class UserService {
 
   createUser = async (body) => {
     const hashPassword = await bcrypt.hash(body.password, saltRounds);
-    return await models.User.create({
+    return await models.user.create({
       ...body,
       password: hashPassword,
     });
@@ -102,7 +102,7 @@ class UserService {
 
   activeUser = async (userId) => {
     try {
-      await models.User.update(
+      await models.user.update(
         { verifyStatus: true },
         { where: { id: userId } }
       );
@@ -114,7 +114,7 @@ class UserService {
 
   destroyUser = async (userId) => {
     try {
-      await models.User.destroy({ where: { id: userId } });
+      await models.user.destroy({ where: { id: userId } });
       return true;
     } catch (error) {
       return false;
@@ -123,7 +123,7 @@ class UserService {
 
   getVerifyStatus = async (userId) => {
     try {
-      const user = await models.User.findOne({
+      const user = await models.user.findOne({
         attributes: ["verifyStatus"],
         where: {
           id: userId,

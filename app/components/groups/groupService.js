@@ -7,7 +7,7 @@ const Op = db.Sequelize.Op;
 
 class GroupService {
   getGroupById = async (groupId) => {
-    const group = await models.Group.findOne({
+    const group = await models.group.findOne({
       raw: true,
       where: {
         id: groupId,
@@ -42,7 +42,7 @@ class GroupService {
   };
 
   getListJoinedGroup = async (userId) => {
-    const groups = await models.Group_User.findAll({
+    const groups = await models.group_user.findAll({
       raw: false,
       where: {
         roleId: { [Op.ne]: 1 },
@@ -50,7 +50,7 @@ class GroupService {
       },
       include: [
         {
-          model: models.Group,
+          model: models.group,
           where: {
             deletedAt: null,
           },
@@ -77,7 +77,7 @@ class GroupService {
   };
 
   getTotalMembers = async (groupId) => {
-    const total = await models.Group_User.count({
+    const total = await models.group_user.count({
       distinct: true,
       col: "userId",
       where: { groupId: groupId },
@@ -86,11 +86,11 @@ class GroupService {
   };
 
   getListMembers = async (groupId) => {
-    const members = await models.Group_User.findAll({
+    const members = await models.group_user.findAll({
       attributes: [],
       include: [
         {
-          model: models.User,
+          model: models.user,
           as: "User",
           attributes: { exclude: ["password"] },
         },
@@ -109,11 +109,11 @@ class GroupService {
 
   getListPresentations = async (groupId) => {
     // query with sequelize model
-    // const presentations = await models.Group_Presentation.findAll({
+    // const presentations = await models.group_presentation.findAll({
     //   attributes: [],
     //   include: [
     //     {
-    //       model: models.Presentation,
+    //       model: models.presentation,
     //       as: "Presentation",
     //     },
     //   ],
@@ -142,14 +142,16 @@ class GroupService {
   };
 
   isJoinedGroup = async (groupId, userId) => {
-    const count = await models.Group_User.count({
-      where: {
-        groupId: groupId,
-        userId: userId,
-      },
-    }).catch((err) => {
-      return false;
-    });
+    const count = await models.group_user
+      .count({
+        where: {
+          groupId: groupId,
+          userId: userId,
+        },
+      })
+      .catch((err) => {
+        return false;
+      });
     if (count > 0) {
       return true;
     } else {
@@ -158,24 +160,26 @@ class GroupService {
   };
 
   addUserToGroup = async function (groupId, userId) {
-    const groupUser = await models.Group_User.create({
-      groupId,
-      userId,
-      roleId: 3,
-    }).catch((err) => {
-      return err.message;
-    });
+    const groupUser = await models.group_user
+      .create({
+        groupId,
+        userId,
+        roleId: 3,
+      })
+      .catch((err) => {
+        return err.message;
+      });
     return groupUser;
   };
 
   createGroup = async (groupInfo) => {
     //insert new record to groups table
-    const newGroup = await models.Group.create({
+    const newGroup = await models.group.create({
       ...groupInfo,
     });
 
     //insert new record to group_users table
-    await models.Group_User.create({
+    await models.group_user.create({
       userId: groupInfo.userId,
       groupId: newGroup.id,
       roleId: 1,
@@ -186,11 +190,11 @@ class GroupService {
   };
 
   getOwner = async (groupId) => {
-    const owner = await models.Group_User.findOne({
+    const owner = await models.group_user.findOne({
       where: { groupId: groupId, roleId: 1 },
       include: [
         {
-          model: models.User,
+          model: models.user,
           as: "User",
           attributes: { exclude: ["password"] },
         },
@@ -201,11 +205,11 @@ class GroupService {
   };
 
   getlistCoOwners = async (groupId) => {
-    const coOwners = await models.Group_User.findAll({
+    const coOwners = await models.group_user.findAll({
       where: { groupId: groupId, roleId: 2 },
       include: [
         {
-          model: models.User,
+          model: models.user,
           as: "User",
           attributes: { exclude: ["password"] },
         },
@@ -220,7 +224,7 @@ class GroupService {
 
   getRole = async (groupId, userId) => {
     try {
-      const groupUser = await models.Group_User.findOne({
+      const groupUser = await models.group_user.findOne({
         attributes: ["roleId"],
         where: { groupId: groupId, userId: userId },
         raw: false,
@@ -234,7 +238,7 @@ class GroupService {
 
   changeRole = async (groupId, userId, role) => {
     try {
-      const groupUser = await models.Group_User.update(
+      const groupUser = await models.group_user.update(
         { roleId: role },
         { where: { groupId: groupId, userId: userId } }
       );
@@ -247,7 +251,7 @@ class GroupService {
 
   removeMember = async (groupId, userId) => {
     try {
-      const groupUser = await models.Group_User.destroy({
+      const groupUser = await models.group_user.destroy({
         where: { groupId: groupId, userId: userId },
         force: true,
       });
@@ -260,7 +264,7 @@ class GroupService {
 
   addPresentationToGroup = async (groupId, presentationId) => {
     try {
-      const presentation = await models.Group_Presentation.findOne({
+      const presentation = await models.group_presentation.findOne({
         raw: true,
         where: {
           groupId,
@@ -271,7 +275,7 @@ class GroupService {
         return false;
       }
 
-      await models.Group_Presentation.create({
+      await models.group_presentation.create({
         groupId,
         presentationId,
       });
@@ -284,7 +288,7 @@ class GroupService {
   };
 
   removeGroup = async (groupId) => {
-    await models.Group.destroy({
+    await models.group.destroy({
       where: { id: groupId },
     });
   };

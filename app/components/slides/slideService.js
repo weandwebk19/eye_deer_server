@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 
 class SlideService {
   createSlide = async (slide) => {
-    const newSlide = await models.Slide.create({
+    const newSlide = await models.slide.create({
       ...slide,
     });
 
@@ -12,7 +12,7 @@ class SlideService {
   };
 
   updateSlide = async (slide) => {
-    const newSlide = await models.Slide.update(slide, {
+    const newSlide = await models.slide.update(slide, {
       where: {
         id: slide.id,
       },
@@ -44,7 +44,7 @@ class SlideService {
   };
 
   getListSlideByPresentationId = async (presentationId) => {
-    const slides = await models.Slide.findAll({
+    const slides = await models.slide.findAll({
       raw: true,
       where: {
         presentationId,
@@ -54,7 +54,7 @@ class SlideService {
   };
 
   getSlideTypeById = async (typeId) => {
-    const type = await models.SlideType.findOne({
+    const type = await models.slideType.findOne({
       raw: true,
       where: {
         id: typeId,
@@ -64,7 +64,7 @@ class SlideService {
   };
 
   getMultipleChoiceById = async (contentId) => {
-    const type = await models.MultipleChoice.findOne({
+    const type = await models.multiplechoice.findOne({
       raw: true,
       where: {
         id: contentId,
@@ -74,7 +74,7 @@ class SlideService {
   };
 
   getHeadingById = async (contentId) => {
-    const type = await models.Heading.findOne({
+    const type = await models.heading.findOne({
       raw: true,
       where: {
         id: contentId,
@@ -84,7 +84,7 @@ class SlideService {
   };
 
   getParagraphById = async (contentId) => {
-    const type = await models.Paragraph.findOne({
+    const type = await models.paragraph.findOne({
       raw: true,
       where: {
         id: contentId,
@@ -94,7 +94,7 @@ class SlideService {
   };
 
   getOptionsByContentId = async (contentId) => {
-    const option = await models.Option.findAll({
+    const option = await models.option.findAll({
       raw: true,
       where: {
         contentId,
@@ -104,7 +104,7 @@ class SlideService {
   };
 
   getSlideById = async (slideId) => {
-    const slide = await models.Slide.findOne({
+    const slide = await models.slide.findOne({
       raw: true,
       where: {
         id: slideId,
@@ -114,7 +114,7 @@ class SlideService {
   };
 
   getSlideByIdAndPresentationId = async (slideId, presentationId) => {
-    const slide = await models.Slide.findOne({
+    const slide = await models.slide.findOne({
       raw: true,
       where: {
         presentationId: presentationId,
@@ -125,7 +125,7 @@ class SlideService {
   };
 
   // getOptionBy = async (slideId, presentationId) => {
-  //   const slide = await models.Slide.findOne({
+  //   const slide = await models.slide.findOne({
   //     raw: true,
   //     where: {
   //       presentationId: presentationId,
@@ -136,7 +136,7 @@ class SlideService {
   // };
 
   increaseVote = async (contentId, optionId, newVote) => {
-    const option = await models.Option.update(
+    const option = await models.option.update(
       { vote: newVote },
       {
         where: {
@@ -149,7 +149,7 @@ class SlideService {
   };
 
   createMultipleChoice = async (content) => {
-    const newMultipleChoice = await models.MultipleChoice.create(content, {
+    const newMultipleChoice = await models.multiplechoice.create(content, {
       raw: false,
     });
 
@@ -157,7 +157,7 @@ class SlideService {
   };
 
   createHeading = async (content) => {
-    const newHeading = await models.Heading.create(content, {
+    const newHeading = await models.heading.create(content, {
       raw: false,
     });
 
@@ -165,7 +165,7 @@ class SlideService {
   };
 
   createParagraph = async (content) => {
-    const newParagraph = await models.Paragraph.create(content, {
+    const newParagraph = await models.paragraph.create(content, {
       raw: false,
     });
 
@@ -173,7 +173,7 @@ class SlideService {
   };
 
   updateMultipleChoice = async (content) => {
-    const newContent = await models.MultipleChoice.upsert(content, {
+    const newContent = await models.multiplechoice.upsert(content, {
       where: {
         id: content.id,
         slideId: content.slideId,
@@ -188,7 +188,7 @@ class SlideService {
     //   options: content.options,
     //   layoutId: content.layoutId,
     // };
-    // const newContent = await this.upsert(models.MultipleChoice, rawContent, {
+    // const newContent = await this.upsert(models.multiplechoice, rawContent, {
     //   id: content.id,
     //   slideId: content.slideId,
     // });
@@ -197,7 +197,7 @@ class SlideService {
   };
 
   updateHeading = async (content) => {
-    const newContent = await models.Heading.upsert(content, {
+    const newContent = await models.heading.upsert(content, {
       where: {
         id: content.id,
         slideId: content.slideId,
@@ -212,7 +212,7 @@ class SlideService {
     //   subHeading: content.subHeading ? content.subHeading : "",
     // };
 
-    // const newContent = await this.upsert(models.Heading, rawContent, {
+    // const newContent = await this.upsert(models.heading, rawContent, {
     //   id: content.id,
     //   slideId: content.slideId,
     // });
@@ -220,7 +220,7 @@ class SlideService {
   };
 
   updateParagraph = async (content) => {
-    const newContent = await models.Paragraph.upsert(content, {
+    const newContent = await models.paragraph.upsert(content, {
       where: {
         id: content.id,
         slideId: content.slideId,
@@ -228,7 +228,7 @@ class SlideService {
     });
     return newContent;
 
-    // const newContent = await this.upsert(models.Paragraph, content, {
+    // const newContent = await this.upsert(models.paragraph, content, {
     //   id: content.id,
     //   slideId: content.slideId,
     // });
@@ -236,7 +236,7 @@ class SlideService {
   };
 
   deleteMultipleChoice = async (content) => {
-    const newContent = await models.MultipleChoice.destroy({
+    const newContent = await models.multiplechoice.destroy({
       force: true,
       where: {
         id: content.id,
@@ -248,7 +248,7 @@ class SlideService {
   };
 
   deleteHeading = async (content) => {
-    const newContent = await models.Heading.destroy({
+    const newContent = await models.heading.destroy({
       force: true,
       where: {
         id: content.id,
@@ -260,7 +260,7 @@ class SlideService {
   };
 
   deleteParagraph = async (content) => {
-    const newContent = await models.Paragraph.destroy({
+    const newContent = await models.paragraph.destroy({
       force: true,
       where: {
         id: content.id,
@@ -272,7 +272,7 @@ class SlideService {
   };
 
   updateOption = async (option) => {
-    const newOption = await models.Option.update(option, {
+    const newOption = await models.option.update(option, {
       where: {
         id: option.id,
         contentId: option.contentId,
@@ -282,7 +282,7 @@ class SlideService {
   };
 
   createOption = async (option) => {
-    const newOption = await models.Option.create(option, { raw: false });
+    const newOption = await models.option.create(option, { raw: false });
 
     return newOption;
   };
@@ -295,7 +295,7 @@ class SlideService {
     if (option.contentId) {
       condition.contentId = option.contentId;
     }
-    const newContent = await models.Option.destroy({
+    const newContent = await models.option.destroy({
       force: true,
       where: condition,
     });
@@ -304,7 +304,7 @@ class SlideService {
   };
 
   deleteSlide = async (slideId) => {
-    await models.Slide.destroy({
+    await models.slide.destroy({
       force: true,
       where: {
         id: slideId,
@@ -313,7 +313,7 @@ class SlideService {
   };
 
   resetVote = async (contentId) => {
-    const newOption = await models.Option.update(
+    const newOption = await models.option.update(
       { vote: 0 },
       {
         where: {
@@ -325,7 +325,7 @@ class SlideService {
   };
 
   removeUserVoted = async (slideId) => {
-    const newVoted = await models.UserVoted.destroy({
+    const newVoted = await models.uservoted.destroy({
       force: true,
       where: {
         slideId: slideId,
