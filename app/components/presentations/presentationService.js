@@ -8,7 +8,7 @@ const generatePresentationCode = require("../../utils/generatePresentationCode")
 class PresentationService {
   generateCode = async () => {
     let newCode = generatePresentationCode();
-    const count = await models.Presentation.count({
+    const count = await models.presentation.count({
       // distinct: true,
       where: { code: newCode },
     });
@@ -21,7 +21,7 @@ class PresentationService {
   };
 
   creategroupPresentation = async (groupPresenataion) => {
-    const newResource = await models.Group_Presentation.create({
+    const newResource = await models.group_presentation.create({
       ...groupPresenataion,
     });
 
@@ -30,7 +30,7 @@ class PresentationService {
 
   createPresentation = async (presentation) => {
     const newCode = await this.generateCode();
-    const newPresentation = await models.Presentation.create({
+    const newPresentation = await models.presentation.create({
       ...presentation,
       code: newCode,
     });
@@ -39,7 +39,7 @@ class PresentationService {
   };
 
   getPresentationById = async (presentationId) => {
-    const presentation = await models.Presentation.findOne({
+    const presentation = await models.presentation.findOne({
       where: { id: presentationId },
       raw: true,
     });
@@ -49,7 +49,7 @@ class PresentationService {
 
   removePresentationInGroup = async (groupId, presentationId) => {
     //remove reference to group of presentation in group_presentations table
-    await models.Group_Presentation.destroy({
+    await models.group_presentation.destroy({
       where: {
         groupId,
         presentationId,
@@ -58,14 +58,14 @@ class PresentationService {
   };
 
   createUserVoted = async (userVoted) => {
-    const newResource = await models.UserVoted.create(userVoted);
+    const newResource = await models.uservoted.create(userVoted);
     console.log("newResource", newResource);
 
     return newResource;
   };
 
   countUserVoted = async (userVoted) => {
-    const findResource = await models.UserVoted.count({
+    const findResource = await models.uservoted.count({
       where: {
         presentationId: userVoted.presentationId,
         slideId: userVoted.slideId,
@@ -78,7 +78,7 @@ class PresentationService {
   };
 
   deleteUserVoted = async (userVoted) => {
-    const findResource = await models.UserVoted.destroy({
+    const findResource = await models.uservoted.destroy({
       where: {
         presentationId: userVoted.presentationId,
         slideId: userVoted.slideId,
@@ -106,7 +106,7 @@ class PresentationService {
 
   removePresentation = async (presentationId, userId) => {
     //soft remove presentation
-    await models.Presentation.destroy({
+    await models.presentation.destroy({
       where: {
         id: presentationId,
         userCreated: userId,
@@ -158,13 +158,13 @@ class PresentationService {
   };
 
   createChatQuestion = async (question) => {
-    const newResource = await models.ChatQuestion.create(question);
+    const newResource = await models.chatquestion.create(question);
 
     return newResource;
   };
 
   getListChatQuestion = async (presentationId) => {
-    const questions = await models.ChatQuestion.findAll({
+    const questions = await models.chatquestion.findAll({
       where: { presentationId },
       raw: true,
     });
@@ -173,20 +173,20 @@ class PresentationService {
   };
 
   updateMarkAsAnswered = async (questionId) => {
-    await models.ChatQuestion.update(
+    await models.chatquestion.update(
       { isAnswered: true },
       { where: { id: questionId } }
     );
   };
 
   updateRestoreQuestion = async (questionId) => {
-    await models.ChatQuestion.update(
+    await models.chatquestion.update(
       { isAnswered: false },
       { where: { id: questionId } }
     );
   };
   updatePresentation = async (presentationId, presentationName, status) => {
-    await models.Presentation.update(
+    await models.presentation.update(
       { name: presentationName, status },
       {
         where: {

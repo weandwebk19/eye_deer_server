@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 
 class ParagraphService {
   createParagraph = async (content) => {
-    const newParagraph = await models.Paragraph.create({
+    const newParagraph = await models.paragraph.create({
       heading: content.heading,
       paragraph: content.paragraph,
     });

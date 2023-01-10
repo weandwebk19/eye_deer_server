@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert("SlideTypes", [
+    return queryInterface.bulkInsert("slidetypes", [
       {
         id: 1,
         name: "Multiple Choice",
@@ -26,6 +26,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("SlideTypes", null, {});
+    return queryInterface.bulkDelete("slidetypes", null, {});
   },
 };

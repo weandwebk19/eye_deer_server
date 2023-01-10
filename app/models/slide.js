@@ -9,29 +9,29 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Presentation, {
+      this.belongsTo(models.presentation, {
         foreignKey: "presentationId",
         as: "Presentation",
         constraints: false,
       });
 
-      this.belongsTo(models.SlideType, {
+      this.belongsTo(models.slidetype, {
         foreignKey: "typeId",
         as: "SlideType",
         constraints: false,
       });
 
-      this.belongsTo(models.MultipleChoice, {
+      this.belongsTo(models.multiplechoice, {
         foreignKey: "contentId",
         as: "MultipleChoice",
         constraints: false,
       });
-      this.belongsTo(models.Heading, {
+      this.belongsTo(models.heading, {
         foreignKey: "contentId",
         as: "Heading",
         constraints: false,
       });
-      this.belongsTo(models.Paragraph, {
+      this.belongsTo(models.paragraph, {
         foreignKey: "contentId",
         as: "Paragraph",
         constraints: false,
@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Slide",
+      modelName: "slide",
     }
   );
   return Slide;

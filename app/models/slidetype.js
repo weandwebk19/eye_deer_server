@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "SlideType",
+      modelName: "slidetype",
     }
   );
   return SlideType;

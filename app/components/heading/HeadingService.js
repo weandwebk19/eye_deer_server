@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 
 class HeadingService {
   createHeading = async (content) => {
-    const newHeading = await models.Heading.create({
+    const newHeading = await models.heading.create({
       heading: content.heading,
       subHeading: content.subHeading,
     });

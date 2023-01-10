@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsToMany(models.Group, {
-        through: "Group_Presentation",
+      this.belongsToMany(models.group, {
+        through: "group_presentation",
         foreignKey: "presentationId",
         otherKey: "groupId",
         as: "Presentation",
@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       paranoid: true,
-      modelName: "Presentation",
+      modelName: "presentation",
     }
   );
   return Presentation;
