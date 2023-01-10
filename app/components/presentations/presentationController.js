@@ -223,6 +223,8 @@ class PresentationController {
       });
     }
   };
+
+  //[POST] /presenataions/remove
   removePresentation = async (req, res) => {
     try {
       const { presentationId } = req.body;
