@@ -425,13 +425,14 @@ module.exports = (io, socket) => {
       if (groupsJson) {
         const groups = JSON.parse(groupsJson);
 
-        const groupIndex = groups.indexOf(data);
-        if (groupIndex < 0) {
-          rediscl.set("groups_started", JSON.stringify([...groups, data]));
-
-          socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
-        } else {
+        // const groupIndex = groups.indexOf(data);
+        const groupFind = groups.find((e) => e.groupId === groupId);
+        // console.log("groupIndex", presentationId, groupIndex);
+        if (groupFind) {
           socket.emit("SERVER_SEND_GROUP_STARTED");
+        } else {
+          rediscl.set("groups_started", JSON.stringify([...groups, data]));
+          socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
         }
       } else {
         rediscl.set("groups_started", JSON.stringify([data]));
