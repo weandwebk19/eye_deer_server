@@ -54,7 +54,7 @@ class SlideService {
   };
 
   getSlideTypeById = async (typeId) => {
-    const type = await models.slideType.findOne({
+    const type = await models.slidetype.findOne({
       raw: true,
       where: {
         id: typeId,

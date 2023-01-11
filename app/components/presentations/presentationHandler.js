@@ -79,6 +79,7 @@ module.exports = (io, socket) => {
     socket.join(code);
     socket.room = code;
     console.log("start", data);
+
     rediscl.set(
       code,
       JSON.stringify({
@@ -113,6 +114,15 @@ module.exports = (io, socket) => {
     rediscl.del(`presentation${data.presentationId}_participants`);
     // rediscl.del(`presentation${data.presentationId}_chatMessages`);
     io.sockets.in(data.code).emit("PARTICIPANT_END_PRESENT");
+    // remove group started
+    const groupsJson = await rediscl.get("groups_started");
+    if (groupsJson) {
+      const groups = JSON.parse(groupsJson);
+      const newGroups = groups.filter((group) => group !== data.groupId);
+
+      rediscl.set("groups_started", JSON.stringify(newGroups));
+    }
+
     // console.log("rediscl", await rediscl.get(data));
     // console.log(socket.adapter.rooms);
   };
@@ -366,6 +376,26 @@ module.exports = (io, socket) => {
     }
   };
 
+  const checkIsGroupStarted = async (groupId) => {
+    // check group is started
+    const groupsJson = await rediscl.get("groups_started");
+    if (groupsJson) {
+      const groups = JSON.parse(groupsJson);
+
+      const groupIndex = groups.indexOf(groupId);
+      if (groupIndex < 0) {
+        rediscl.set("groups_started", JSON.stringify([...groups, groupId]));
+
+        socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
+      } else {
+        socket.emit("SERVER_SEND_GROUP_STARTED");
+      }
+    } else {
+      rediscl.set("groups_started", JSON.stringify([groupId]));
+      socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
+    }
+  };
+
   socket.on("CLIENT_SEND_JOIN_PRESENTATION", userJoinPresent);
   socket.on("HOST_START_PRESENT", startPresent);
   socket.on("HOST_END_PRESENT", endPresent);
@@ -383,4 +413,5 @@ module.exports = (io, socket) => {
   socket.on("CLIENT_GET_LIST_PARTICIPANTS", handleResponseParticipantsList);
   socket.on("CLIENT_CONECTED", handleSetUserToRedis);
   socket.on("CLIENT_DISCONECTED", handleRemoveUserFromRedis);
+  socket.on("CLIENT_SEND_IS_GROUP_STARTED", checkIsGroupStarted);
 };
