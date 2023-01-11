@@ -397,6 +397,32 @@ class PresentationController {
       });
     }
   };
+
+  // [GET] /presenataions/:id/slides
+  getFirstSlide = async function (req, res) {
+    try {
+      const presentationId = req.params.id;
+      const slide = await slideService.getSlideByPresentationId(presentationId);
+
+      if (slide) {
+        return res.status(200).json({
+          success: true,
+          message: "Get first slide of presentation successfully.",
+          data: slide,
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "presentation not found.",
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
 }
 
 module.exports = new PresentationController();

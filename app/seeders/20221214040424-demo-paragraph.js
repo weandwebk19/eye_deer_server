@@ -12,6 +12,14 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        id: 2,
+        slideId: 4,
+        heading: "Test paragraph",
+        paragraph: "No pain no gain.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

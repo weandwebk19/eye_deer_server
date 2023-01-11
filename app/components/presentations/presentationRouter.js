@@ -74,4 +74,9 @@ router.post("/update", function (req, res, next) {
   PresentationController.updatePresentation(req, res);
 });
 
+// Get first slide
+router.get("/:id/slides/first", function (req, res, next) {
+  PresentationController.getFirstSlide(req, res);
+});
+
 module.exports = router;

@@ -124,6 +124,16 @@ class SlideService {
     return slide;
   };
 
+  getSlideByPresentationId = async (presentationId) => {
+    const slide = await models.slide.findOne({
+      raw: true,
+      where: {
+        presentationId: presentationId,
+      },
+    });
+    return slide;
+  };
+
   // getOptionBy = async (slideId, presentationId) => {
   //   const slide = await models.slide.findOne({
   //     raw: true,
