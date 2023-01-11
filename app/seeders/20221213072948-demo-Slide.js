@@ -34,6 +34,16 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        name: "Slide 4",
+        index: 1,
+        typeId: 3,
+        presentationId: 2,
+        contentId: 2,
+        note: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

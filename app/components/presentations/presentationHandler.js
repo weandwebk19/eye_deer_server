@@ -75,93 +75,109 @@ module.exports = (io, socket) => {
   };
 
   const startPresent = async (data) => {
-    const { code, presentationId, slideId, groupId, user } = data;
-    socket.join(code);
-    socket.room = code;
-    console.log("start", data);
+    try {
+      const { code, presentationId, slideId, groupId, user } = data;
+      socket.join(code);
+      socket.room = code;
+      console.log("start", data);
 
-    rediscl.set(
-      code,
-      JSON.stringify({
-        presentationId,
-        slideId,
-        groupId,
-        host: socket.id,
-      })
-    );
-    rediscl.set(
-      `presentation${presentationId}_participants`,
-      JSON.stringify([
-        {
-          ...user,
-        },
-      ])
-    );
-    // console.log("rediscl", await rediscl.get(code));
-    // console.log(socket.adapter.rooms);
+      rediscl.set(
+        code,
+        JSON.stringify({
+          presentationId,
+          slideId,
+          groupId,
+          host: socket.id,
+        })
+      );
+      rediscl.set(
+        `presentation${presentationId}_participants`,
+        JSON.stringify([
+          {
+            ...user,
+          },
+        ])
+      );
+      // console.log("rediscl", await rediscl.get(code));
+      // console.log(socket.adapter.rooms);
 
-    // notify to all members in group
-    const members = await groupService.getListMembers(groupId);
-    members.forEach(async (member) => {
-      const socketId = await rediscl.get(`socketid_${member.id}`);
-      io.sockets.to(socketId).emit("SERVER_SEND_HOST_START_PRESENT", data);
-    });
+      // notify to all members in group
+      const members = await groupService.getListMembers(groupId);
+      members.forEach(async (member) => {
+        const socketId = await rediscl.get(`socketid_${member.id}`);
+        io.sockets.to(socketId).emit("SERVER_SEND_HOST_START_PRESENT", data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const endPresent = async (data) => {
-    console.log("end present", data);
-    rediscl.del(data.code);
-    rediscl.del(`presentation${data.presentationId}_participants`);
-    // rediscl.del(`presentation${data.presentationId}_chatMessages`);
-    io.sockets.in(data.code).emit("PARTICIPANT_END_PRESENT");
-    // remove group started
-    const groupsJson = await rediscl.get("groups_started");
-    if (groupsJson) {
-      const groups = JSON.parse(groupsJson);
-      const newGroups = groups.filter(
-        (group) => group.groupId !== data.groupId
-      );
+    try {
+      console.log("end present", data);
+      rediscl.del(data.code);
+      rediscl.del(`presentation${data.presentationId}_participants`);
+      // rediscl.del(`presentation${data.presentationId}_chatMessages`);
+      io.sockets.in(data.code).emit("PARTICIPANT_END_PRESENT");
+      // remove group started
+      const groupsJson = await rediscl.get("groups_started");
+      if (groupsJson) {
+        const groups = JSON.parse(groupsJson);
+        const newGroups = groups.filter(
+          (group) => group.groupId !== data.groupId
+        );
 
-      rediscl.set("groups_started", JSON.stringify(newGroups));
+        rediscl.set("groups_started", JSON.stringify(newGroups));
+      }
+
+      // console.log("rediscl", await rediscl.get(data));
+      // console.log(socket.adapter.rooms);
+    } catch (error) {
+      console.log(error);
     }
-
-    // console.log("rediscl", await rediscl.get(data));
-    // console.log(socket.adapter.rooms);
   };
 
   const moveToSlide = async (data) => {
-    const { code, presentationId, slideId } = data;
-    console.log("move to sldie", data);
-    const currentPresentationJson = await rediscl.get(data.code);
-    const currentPresentation = JSON.parse(currentPresentationJson);
+    try {
+      const { code, presentationId, slideId } = data;
+      console.log("move to sldie", data);
+      const currentPresentationJson = await rediscl.get(data.code);
+      const currentPresentation = JSON.parse(currentPresentationJson);
 
-    rediscl.set(
-      code,
-      JSON.stringify({
-        ...currentPresentation,
-        presentationId,
-        slideId,
-      })
-    );
-    io.sockets.in(code).emit("PARTICIPANT_MOVE_TO_SLIDE", slideId);
+      rediscl.set(
+        code,
+        JSON.stringify({
+          ...currentPresentation,
+          presentationId,
+          slideId,
+        })
+      );
+      io.sockets.in(code).emit("PARTICIPANT_MOVE_TO_SLIDE", slideId);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const increaseVote = async (data) => {
-    console.log("increaseVote", data);
-    const currentPresentationJson = await rediscl.get(data.code);
-    const currentPresentation = JSON.parse(currentPresentationJson);
+    try {
+      console.log("increaseVote", data);
+      const currentPresentationJson = await rediscl.get(data.code);
+      const currentPresentation = JSON.parse(currentPresentationJson);
 
-    if (currentPresentation) {
-      // console.log("currentPresentation", currentPresentation);
-      const host = currentPresentation.host;
-      io.sockets.to(host).emit("SERVER_SEND_INCREASE_VOTE", data);
+      if (currentPresentation) {
+        // console.log("currentPresentation", currentPresentation);
+        const host = currentPresentation.host;
+        io.sockets.to(host).emit("SERVER_SEND_INCREASE_VOTE", data);
 
-      const { presentationId, slideId, userId } = data;
-      const userVoted = await presentationService.createUserVoted({
-        presentationId,
-        slideId,
-        userId,
-      });
+        const { presentationId, slideId, userId } = data;
+        const userVoted = await presentationService.createUserVoted({
+          presentationId,
+          slideId,
+          userId,
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -224,73 +240,89 @@ module.exports = (io, socket) => {
   };
 
   const handleResponseChatQuestion = async (data) => {
-    const { code, presentationId } = data;
-    const chatQuestionsJson = await rediscl.get(
-      `presentation${presentationId}_chatQuestions`
-    );
-    if (chatQuestionsJson) {
-      const chatQuestions = JSON.parse(chatQuestionsJson);
-      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+    try {
+      const { code, presentationId } = data;
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${presentationId}_chatQuestions`
+      );
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const markAsAnsweredQuestion = async (data) => {
-    // await presentationService.updateMarkAsAnswered(data.questionId);
-    // io.sockets.emit("PARTICIPANT_QUESTION_ANSWERED", data);
+    try {
+      // await presentationService.updateMarkAsAnswered(data.questionId);
+      // io.sockets.emit("PARTICIPANT_QUESTION_ANSWERED", data);
 
-    const chatQuestionsJson = await rediscl.get(
-      `presentation${data.presentationId}_chatQuestions`
-    );
-    if (chatQuestionsJson) {
-      const chatQuestions = JSON.parse(chatQuestionsJson);
-      chatQuestions.find(
-        (question) => question.id === data.questionId
-      ).isAnswered = true;
-      rediscl.set(
-        `presentation${data.presentationId}_chatQuestions`,
-        JSON.stringify(chatQuestions)
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${data.presentationId}_chatQuestions`
       );
-      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
-      io.sockets
-        .in(data.code)
-        .emit("PARTICIPANT_QUESTION_ANSWERED", chatQuestions);
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        chatQuestions.find(
+          (question) => question.id === data.questionId
+        ).isAnswered = true;
+        rediscl.set(
+          `presentation${data.presentationId}_chatQuestions`,
+          JSON.stringify(chatQuestions)
+        );
+        socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+        io.sockets
+          .in(data.code)
+          .emit("PARTICIPANT_QUESTION_ANSWERED", chatQuestions);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const restoreQuestion = async (data) => {
-    // await presentationService.updateRestoreQuestion(data.questionId);
-    // io.sockets.emit("PARTICIPANT_QUESTION_RESTORED", data);
+    try {
+      // await presentationService.updateRestoreQuestion(data.questionId);
+      // io.sockets.emit("PARTICIPANT_QUESTION_RESTORED", data);
 
-    const chatQuestionsJson = await rediscl.get(
-      `presentation${data.presentationId}_chatQuestions`
-    );
-    if (chatQuestionsJson) {
-      const chatQuestions = JSON.parse(chatQuestionsJson);
-      chatQuestions.find(
-        (question) => question.id === data.questionId
-      ).isAnswered = false;
-      rediscl.set(
-        `presentation${data.presentationId}_chatQuestions`,
-        JSON.stringify(chatQuestions)
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${data.presentationId}_chatQuestions`
       );
-      socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
-      io.sockets
-        .in(data.code)
-        .emit("PARTICIPANT_QUESTION_RESTORED", chatQuestions);
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        chatQuestions.find(
+          (question) => question.id === data.questionId
+        ).isAnswered = false;
+        rediscl.set(
+          `presentation${data.presentationId}_chatQuestions`,
+          JSON.stringify(chatQuestions)
+        );
+        socket.emit("SERVER_SEND_LIST_QUESTIONS", chatQuestions);
+        io.sockets
+          .in(data.code)
+          .emit("PARTICIPANT_QUESTION_RESTORED", chatQuestions);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const handleResponseQuestionUpvote = async (data) => {
-    const { questionId, presentationId } = data;
-    const chatQuestionsJson = await rediscl.get(
-      `presentation${presentationId}_chatQuestions`
-    );
-    if (chatQuestionsJson) {
-      const chatQuestions = JSON.parse(chatQuestionsJson);
-      const questionUpvotes = await chatQuestions.find(
-        (question) => question.id === questionId
+    try {
+      const { questionId, presentationId } = data;
+      const chatQuestionsJson = await rediscl.get(
+        `presentation${presentationId}_chatQuestions`
       );
-      socket.emit("SERVER_SEND_LIST_UPVOTES", questionUpvotes);
+      if (chatQuestionsJson) {
+        const chatQuestions = JSON.parse(chatQuestionsJson);
+        const questionUpvotes = await chatQuestions.find(
+          (question) => question.id === questionId
+        );
+        socket.emit("SERVER_SEND_LIST_UPVOTES", questionUpvotes);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -345,13 +377,17 @@ module.exports = (io, socket) => {
     }
   };
   const handleResponseChatMessage = async (data) => {
-    const { code, presentationId } = data;
-    const chatMessagesJson = await rediscl.get(
-      `presentation${presentationId}_chatMessages`
-    );
-    if (chatMessagesJson) {
-      const chatMessages = JSON.parse(chatMessagesJson);
-      socket.emit("SERVER_SEND_LIST_MESSAGES", chatMessages);
+    try {
+      const { code, presentationId } = data;
+      const chatMessagesJson = await rediscl.get(
+        `presentation${presentationId}_chatMessages`
+      );
+      if (chatMessagesJson) {
+        const chatMessages = JSON.parse(chatMessagesJson);
+        socket.emit("SERVER_SEND_LIST_MESSAGES", chatMessages);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -379,38 +415,46 @@ module.exports = (io, socket) => {
   };
 
   const checkIsGroupStarted = async (data) => {
-    const { groupId, presentationId } = data;
-    // check group is started
-    const groupsJson = await rediscl.get("groups_started");
-    if (groupsJson) {
-      const groups = JSON.parse(groupsJson);
+    try {
+      const { groupId, presentationId } = data;
+      // check group is started
+      const groupsJson = await rediscl.get("groups_started");
+      if (groupsJson) {
+        const groups = JSON.parse(groupsJson);
 
-      const groupIndex = groups.indexOf(data);
-      if (groupIndex < 0) {
-        rediscl.set("groups_started", JSON.stringify([...groups, data]));
+        const groupIndex = groups.indexOf(data);
+        if (groupIndex < 0) {
+          rediscl.set("groups_started", JSON.stringify([...groups, data]));
 
-        socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
+          socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
+        } else {
+          socket.emit("SERVER_SEND_GROUP_STARTED");
+        }
       } else {
-        socket.emit("SERVER_SEND_GROUP_STARTED");
+        rediscl.set("groups_started", JSON.stringify([data]));
+        socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
       }
-    } else {
-      rediscl.set("groups_started", JSON.stringify([data]));
-      socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
+    } catch (err) {
+      console.log(err);
     }
   };
 
   const getPresentationPresentingInGroup = async (groupId) => {
-    const groupsJson = await rediscl.get("groups_started");
-    if (groupsJson) {
-      const groups = JSON.parse(groupsJson);
+    try {
+      const groupsJson = await rediscl.get("groups_started");
+      if (groupsJson) {
+        const groups = JSON.parse(groupsJson);
 
-      const currentPresentation = groups.find((e) => e.groupId === groupId);
-      if (currentPresentation?.presentationId) {
-        socket.emit(
-          "SERVER_SEND_PRESENTATION_PRESENTING",
-          currentPresentation.presentationId
-        );
+        const currentPresentation = groups.find((e) => e.groupId === groupId);
+        if (currentPresentation?.presentationId) {
+          socket.emit(
+            "SERVER_SEND_PRESENTATION_PRESENTING",
+            currentPresentation.presentationId
+          );
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 
