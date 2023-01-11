@@ -86,7 +86,7 @@ module.exports = (io, socket) => {
         JSON.stringify({
           presentationId,
           slideId,
-          groupId,
+          groupId: groupId ? groupId : null,
           host: socket.id,
         })
       );
@@ -102,11 +102,13 @@ module.exports = (io, socket) => {
       // console.log(socket.adapter.rooms);
 
       // notify to all members in group
-      const members = await groupService.getListMembers(groupId);
-      members.forEach(async (member) => {
-        const socketId = await rediscl.get(`socketid_${member.id}`);
-        io.sockets.to(socketId).emit("SERVER_SEND_HOST_START_PRESENT", data);
-      });
+      if (groupId) {
+        const members = await groupService.getListMembers(groupId);
+        members.forEach(async (member) => {
+          const socketId = await rediscl.get(`socketid_${member.id}`);
+          io.sockets.to(socketId).emit("SERVER_SEND_HOST_START_PRESENT", data);
+        });
+      }
     } catch (error) {
       console.log(error);
     }
