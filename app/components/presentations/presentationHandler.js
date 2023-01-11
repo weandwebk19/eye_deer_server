@@ -118,7 +118,9 @@ module.exports = (io, socket) => {
     const groupsJson = await rediscl.get("groups_started");
     if (groupsJson) {
       const groups = JSON.parse(groupsJson);
-      const newGroups = groups.filter((group) => group !== data.groupId);
+      const newGroups = groups.filter(
+        (group) => group.groupId !== data.groupId
+      );
 
       rediscl.set("groups_started", JSON.stringify(newGroups));
     }
@@ -376,23 +378,39 @@ module.exports = (io, socket) => {
     }
   };
 
-  const checkIsGroupStarted = async (groupId) => {
+  const checkIsGroupStarted = async (data) => {
+    const { groupId, presentationId } = data;
     // check group is started
     const groupsJson = await rediscl.get("groups_started");
     if (groupsJson) {
       const groups = JSON.parse(groupsJson);
 
-      const groupIndex = groups.indexOf(groupId);
+      const groupIndex = groups.indexOf(data);
       if (groupIndex < 0) {
-        rediscl.set("groups_started", JSON.stringify([...groups, groupId]));
+        rediscl.set("groups_started", JSON.stringify([...groups, data]));
 
         socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
       } else {
         socket.emit("SERVER_SEND_GROUP_STARTED");
       }
     } else {
-      rediscl.set("groups_started", JSON.stringify([groupId]));
+      rediscl.set("groups_started", JSON.stringify([data]));
       socket.emit("SERVER_SEND_GROUP_NOT_STARTED");
+    }
+  };
+
+  const getPresentationPresentingInGroup = async (groupId) => {
+    const groupsJson = await rediscl.get("groups_started");
+    if (groupsJson) {
+      const groups = JSON.parse(groupsJson);
+
+      const currentPresentation = groups.find((e) => e.groupId === groupId);
+      if (currentPresentation?.presentationId) {
+        socket.emit(
+          "SERVER_SEND_PRESENTATION_PRESENTING",
+          currentPresentation.presentationId
+        );
+      }
     }
   };
 
@@ -414,4 +432,8 @@ module.exports = (io, socket) => {
   socket.on("CLIENT_CONECTED", handleSetUserToRedis);
   socket.on("CLIENT_DISCONECTED", handleRemoveUserFromRedis);
   socket.on("CLIENT_SEND_IS_GROUP_STARTED", checkIsGroupStarted);
+  socket.on(
+    "GET_PRESENTATION_PRESENTING_IN_GROUP",
+    getPresentationPresentingInGroup
+  );
 };
